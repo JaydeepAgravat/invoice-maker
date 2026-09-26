@@ -17,9 +17,13 @@ import { DocumentEditorScreen } from '@/features/editor/DocumentEditorScreen';
 import { InboxScreen } from '@/features/inbox/InboxScreen';
 import { ItemEditorScreen } from '@/features/items/ItemEditorScreen';
 import { ItemsScreen } from '@/features/items/ItemsScreen';
+import { PreviewScreen } from '@/features/preview/PreviewScreen';
 import { OnboardingScreen } from '@/features/onboarding/OnboardingScreen';
 import { CommandPaletteScreen } from '@/features/palette/CommandPaletteScreen';
 import { PlaceholderScreen } from '@/features/placeholder/PlaceholderScreen';
+import { BusinessProfileScreen } from '@/features/settings/BusinessProfileScreen';
+import { PaymentMethodEditorScreen } from '@/features/settings/PaymentMethodEditorScreen';
+import { PaymentMethodsScreen } from '@/features/settings/PaymentMethodsScreen';
 import { SettingsScreen } from '@/features/settings/SettingsScreen';
 import { breakpoints } from '@/ui/theme';
 
@@ -113,6 +117,7 @@ export function RootNavigator() {
         options={{ animation: 'slide_from_bottom' }}
       />
       <Stack.Screen name="DocumentDetail" component={DocumentDetailScreen} />
+      <Stack.Screen name="DocumentPreview" component={PreviewScreen} />
       <Stack.Screen name="ClientDetail" component={ClientDetailScreen} />
       <Stack.Screen
         name="ClientEditor"
@@ -122,6 +127,17 @@ export function RootNavigator() {
       <Stack.Screen
         name="ItemEditor"
         component={ItemEditorScreen}
+        options={{ animation: 'slide_from_bottom' }}
+      />
+      <Stack.Screen
+        name="BusinessProfile"
+        component={BusinessProfileScreen}
+        options={{ animation: 'slide_from_bottom' }}
+      />
+      <Stack.Screen name="PaymentMethods" component={PaymentMethodsScreen} />
+      <Stack.Screen
+        name="PaymentMethodEditor"
+        component={PaymentMethodEditorScreen}
         options={{ animation: 'slide_from_bottom' }}
       />
       <Stack.Screen

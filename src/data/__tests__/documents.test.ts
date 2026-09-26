@@ -1,6 +1,8 @@
 import type { Database } from '../db/types';
 import { createClient } from '../repositories/clients';
 import {
+  recordShare,
+  documentsSharedInMonth,
   ActionNotAllowedError,
   applyAction,
   convertEstimateToInvoice,
@@ -689,5 +691,27 @@ describe('purgeEmptyDrafts', () => {
     expect(await getDocument(db, empty.id)).toBeNull();
     expect(await getDocument(db, withLine.doc.id)).not.toBeNull();
     expect(await getDocument(db, withClient.id)).not.toBeNull();
+  });
+});
+
+describe('sharing', () => {
+  it('issues a draft on first share and only logs later shares', async () => {
+    const env = await setupDb();
+    const [sdb, sclock] = [env.db, env.clock];
+    const draft = await createDraft(sdb, sclock, 'INVOICE');
+    const shared = await recordShare(sdb, sclock, draft.id, 'whatsapp');
+    expect(shared.number).toBe('INV-0001');
+    expect(shared.status).toBe('SENT');
+    const snapshot = shared.businessSnapshot;
+    const again = await recordShare(sdb, sclock, draft.id, 'email');
+    expect(again.businessSnapshot).toEqual(snapshot);
+    const kinds = (await listActivity(sdb, draft.id)).map(a => a.kind);
+    expect(kinds).toEqual(expect.arrayContaining(['SENT', 'SHARED']));
+    expect(await documentsSharedInMonth(sdb, '2026-09')).toBe(1);
+    const other = await createDraft(sdb, sclock, 'ESTIMATE');
+    await recordShare(sdb, sclock, other.id, 'print');
+    expect(await documentsSharedInMonth(sdb, '2026-09')).toBe(2);
+    expect(await documentsSharedInMonth(sdb, '2026-10')).toBe(0);
+    await expect(recordShare(sdb, sclock, 'missing', 'x')).rejects.toThrow();
   });
 });

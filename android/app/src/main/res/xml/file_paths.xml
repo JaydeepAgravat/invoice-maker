@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Only these folders can ever be shared with other apps. -->
+<paths>
+  <cache-path name="pdf" path="pdf/" />
+  <cache-path name="capture" path="capture/" />
+  <cache-path name="export" path="export/" />
+</paths>

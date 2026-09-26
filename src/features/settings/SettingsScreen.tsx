@@ -1,11 +1,15 @@
 import { useNavigation } from '@react-navigation/native';
-import { Check, LayoutGrid, Menu } from 'lucide-react-native';
+import { Building2, Check, CreditCard, Crown, LayoutGrid, Menu } from 'lucide-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, View, useWindowDimensions } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
 
 import type { DrawerProps } from '@/app/navigation';
+import { setPro, useIsPro } from '@/billing/entitlement';
+import { useLiveQuery } from '@/data/live';
+import { useProfile } from '@/data/ProfileProvider';
+import { listPaymentMethods } from '@/data/repositories/paymentMethods';
 import { DevDataTools } from '@/features/dev/DevDataTools';
 import { SUPPORTED_LANGUAGES, setLanguage, type Language } from '@/i18n';
 import { PrefKeys, prefs } from '@/lib/storage';
@@ -48,6 +52,10 @@ export function SettingsScreen({ navigation }: DrawerProps<'Settings'>) {
     () => (prefs.getString(PrefKeys.language) as Language | undefined) ?? null,
   );
 
+  const { profile } = useProfile();
+  const pro = useIsPro();
+  const { data: methods } = useLiveQuery(db => listPaymentMethods(db), []);
+
   const chooseLanguage = (next: Language | null) => {
     haptics.play('selection');
     setLang(next);
@@ -69,6 +77,31 @@ export function SettingsScreen({ navigation }: DrawerProps<'Settings'>) {
         }
       />
       <ScrollView contentContainerStyle={styles.content}>
+        <SectionHeader title={t('settings.business')} />
+        <Surface style={styles.card}>
+          <ListRow
+            testID="settings-business"
+            leadingIcon={Building2}
+            title={t('business.title')}
+            subtitle={profile.name ?? t('editor.notSet')}
+            showChevron
+            onPress={() => root.navigate('BusinessProfile')}
+          />
+          <Divider inset={52} />
+          <ListRow
+            testID="settings-payments"
+            leadingIcon={CreditCard}
+            title={t('paymentDetails.title')}
+            subtitle={
+              methods?.length
+                ? t('paymentDetails.count', { count: methods.length })
+                : t('editor.notSet')
+            }
+            showChevron
+            onPress={() => root.navigate('PaymentMethods')}
+          />
+        </Surface>
+
         <SectionHeader title={t('settings.appearance')} />
         <Surface style={styles.card}>
           <View style={styles.field}>
@@ -145,6 +178,19 @@ export function SettingsScreen({ navigation }: DrawerProps<'Settings'>) {
                 leadingIcon={LayoutGrid}
                 showChevron
                 onPress={() => root.navigate('KitchenSink')}
+              />
+              <Divider inset={52} />
+              <ListRow
+                title={t('settings.devPro')}
+                leadingIcon={Crown}
+                onPress={() => setPro(!pro)}
+                trailing={
+                  <Switch
+                    value={pro}
+                    onValueChange={setPro}
+                    accessibilityLabel={t('settings.devPro')}
+                  />
+                }
               />
               <Divider inset={52} />
               <DevDataTools />

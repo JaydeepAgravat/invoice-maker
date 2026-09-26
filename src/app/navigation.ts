@@ -27,10 +27,14 @@ export type RootStackParamList = {
   Main: NavigatorScreenParams<DrawerParamList> | undefined;
   DocumentEditor: { id: string; isNew?: boolean };
   DocumentDetail: { id: string };
+  DocumentPreview: { id: string };
   ClientDetail: { id: string };
   ClientEditor: { id?: string; name?: string } | undefined;
   ItemEditor: { id?: string } | undefined;
   CommandPalette: undefined;
+  BusinessProfile: undefined;
+  PaymentMethods: undefined;
+  PaymentMethodEditor: { id?: string } | undefined;
   KitchenSink: undefined;
 };
 

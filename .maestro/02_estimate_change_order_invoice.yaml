@@ -26,6 +26,8 @@ name: 02_estimate_change_order_invoice
 - tapOn: { id: "line-save" }
 - tapOn:
     id: "editor-issue"
+- tapOn:
+    id: "share-mark-sent"
 - extendedWaitUntil:
     visible: "EST-0001"
     timeout: 10000
@@ -49,6 +51,8 @@ name: 02_estimate_change_order_invoice
 - tapOn: { id: "line-save" }
 - tapOn:
     id: "editor-issue"
+- tapOn:
+    id: "share-mark-sent"
 - extendedWaitUntil:
     visible: "CO-0001"
     timeout: 10000

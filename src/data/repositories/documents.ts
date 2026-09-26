@@ -1131,3 +1131,79 @@ export const toFtsQuery = (input: string): string | null => {
     .slice(0, 8);
   return tokens.length ? tokens.map(t => `"${t}"*`).join(' AND ') : null;
 };
+
+/* ────────────────────────────── Sharing ──────────────────────────── */
+
+/**
+ * Record that a document left the app. A draft is issued first (numbered,
+ * details frozen, marked sent); an already issued one only gets a log entry,
+ * so its frozen details never change on a re-share.
+ */
+export async function recordShare(
+  db: Executor,
+  clock: Clock,
+  id: string,
+  channel: string,
+): Promise<DocumentRecord> {
+  let doc = await getDocument(db, id);
+  if (!doc) {
+    throw new Error('Document not found');
+  }
+  if (!doc.number || doc.status === 'DRAFT') {
+    doc = await issueDocument(db, clock, id, { channel });
+  } else {
+    await log(db, clock, id, 'SHARED', { channel });
+  }
+  await db.execute(
+    'INSERT INTO share_log (id, document_id, channel, month, shared_at) VALUES (?, ?, ?, ?, ?)',
+    [uuidv7(clock.now()), id, channel, clock.today().slice(0, 7), clock.now()],
+  );
+  return doc;
+}
+
+/** Documents shared for the first time in a calendar month (free-tier limit). */
+export async function documentsSharedInMonth(
+  db: Executor,
+  month: string,
+): Promise<number> {
+  const { rows } = await db.execute(
+    `SELECT COUNT(*) AS n FROM (
+       SELECT document_id FROM share_log GROUP BY document_id HAVING MIN(month) = ?
+     )`,
+    [month],
+  );
+  return reqNum(rows[0]!.n);
+}
+
+/** Template, colour and paper are presentation only: no revision, no log. */
+export async function setAppearance(
+  db: Executor,
+  clock: Clock,
+  id: string,
+  patch: {
+    templateId?: string | null;
+    accentColor?: string | null;
+    paperSize?: 'A4' | 'LETTER' | null;
+  },
+): Promise<void> {
+  const sets: string[] = [];
+  const values: SqlValue[] = [];
+  if (patch.templateId !== undefined) {
+    sets.push('template_id = ?');
+    values.push(patch.templateId);
+  }
+  if (patch.accentColor !== undefined) {
+    sets.push('accent_color = ?');
+    values.push(patch.accentColor);
+  }
+  if (patch.paperSize !== undefined) {
+    sets.push('paper_size = ?');
+    values.push(patch.paperSize);
+  }
+  if (sets.length) {
+    await db.execute(
+      `UPDATE documents SET ${sets.join(', ')}, updated_at = ? WHERE id = ?`,
+      [...values, clock.now(), id],
+    );
+  }
+}

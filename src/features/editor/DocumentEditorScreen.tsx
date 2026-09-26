@@ -1,6 +1,8 @@
 import { usePreventRemove } from '@react-navigation/native';
 import {
   CalendarDays,
+  Eye,
+  Send,
   Check,
   Coins,
   FileText,
@@ -37,7 +39,6 @@ import {
   defaultLineTaxes,
   deleteDraft,
   getDocument,
-  issueDocument,
   saveDocument,
   toDraft,
   type DocumentDraft,
@@ -74,7 +75,9 @@ import { ClientPickerSheet } from './ClientPickerSheet';
 import { CurrencySheet } from './CurrencySheet';
 import { DiscountSheet } from './DiscountSheet';
 import { LineSheet } from './LineSheet';
+import { NumberingSheet } from './NumberingSheet';
 import { TextSheet } from './TextSheet';
+import { ShareSheet, type ShareSheetRef } from '../share/ShareSheet';
 
 const AUTOSAVE_MS = 400;
 
@@ -102,7 +105,6 @@ export function DocumentEditorScreen({
   const [draft, setDraft] = useState<DocumentDraft | null>(null);
   const [client, setClient] = useState<Client | null>(null);
   const [defaultTaxes, setDefaultTaxes] = useState<LineTaxSnapshot[]>([]);
-  const [numberPreview, setNumberPreview] = useState<string | null>(null);
   const [saved, setSaved] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [dirty, setDirty] = useState(false);
   const [editingLine, setEditingLine] = useState<{
@@ -122,8 +124,17 @@ export function DocumentEditorScreen({
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const latest = useRef<DocumentDraft | null>(null);
   const leaving = useRef(false);
+  const numberingSheet = useRef<SheetRef>(null);
+  const shareSheet = useRef<ShareSheetRef>(null);
 
   const isIssued = !!record && record.status !== 'DRAFT';
+  const { data: numberPreview } = useLiveQuery(
+    async db =>
+      record && !record.number && draft
+        ? previewNumber(db, record.type, draft.issueDate)
+        : null,
+    [record?.number, record?.type, draft?.issueDate],
+  );
 
   // Load once. Later DB refreshes must not overwrite what the person is typing.
   useEffect(() => {
@@ -135,9 +146,6 @@ export function DocumentEditorScreen({
         setDefaultTaxes(await defaultLineTaxes(db));
         if (d.clientId) {
           setClient(await getClient(db, d.clientId));
-        }
-        if (!record.number) {
-          setNumberPreview(await previewNumber(db, record.type, d.issueDate));
         }
       });
     }
@@ -303,20 +311,20 @@ export function DocumentEditorScreen({
     }
   };
 
-  const issue = async () => {
+  const flush = async () => {
     if (timer.current || dirty) {
       await persist();
     }
-    const issued = await mutate(tx =>
-      issueDocument(tx, clock, id, { channel: 'manual' }),
-    );
-    toast.show({
-      message: t('toast.markedSent', { number: issued.number }),
-      tone: 'success',
-      haptic: 'success',
-    });
-    leaving.current = true;
-    navigation.replace('DocumentDetail', { id });
+  };
+
+  const send = async () => {
+    await flush();
+    shareSheet.current?.present(id);
+  };
+
+  const preview = async () => {
+    await flush();
+    navigation.push('DocumentPreview', { id });
   };
 
   const saveIssued = async () => {
@@ -388,18 +396,26 @@ export function DocumentEditorScreen({
           />
         }
         right={
-          saved === 'saved' && !isIssued ? (
-            <Animated.View
-              entering={FadeIn}
-              exiting={FadeOut}
-              style={styles.saved}
-            >
-              <Icon icon={Check} size={14} tone="tertiary" />
-              <Text variant="caption" tone="tertiary">
-                {t('editor.saved')}
-              </Text>
-            </Animated.View>
-          ) : undefined
+          <>
+            {saved === 'saved' && !isIssued ? (
+              <Animated.View
+                entering={FadeIn}
+                exiting={FadeOut}
+                style={styles.saved}
+              >
+                <Icon icon={Check} size={14} tone="tertiary" />
+                <Text variant="caption" tone="tertiary">
+                  {t('editor.saved')}
+                </Text>
+              </Animated.View>
+            ) : null}
+            <IconButton
+              testID="editor-preview"
+              icon={Eye}
+              label={t('preview.title')}
+              onPress={preview}
+            />
+          </>
         }
       />
 
@@ -791,20 +807,61 @@ export function DocumentEditorScreen({
                 <Text variant="caption" tone="tertiary" tabular>
                   {t('editor.willBeNumbered', { number: numberPreview })}
                 </Text>
+                <Touchable
+                  testID="editor-numbering"
+                  feedback="highlight"
+                  hitSlop={10}
+                  style={styles.change}
+                  onPress={() => numberingSheet.current?.present()}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('numbering.title')}
+                >
+                  <Text variant="captionMedium" tone="accent">
+                    {t('numbering.change')}
+                  </Text>
+                </Touchable>
               </View>
             ) : null}
-            <Button
-              testID="editor-issue"
-              variant="primary"
-              size="lg"
-              fullWidth
-              label={t('editor.markAsSent')}
-              onPress={issue}
-            />
+            <View style={styles.footerRow}>
+              <View style={styles.previewButton}>
+                <Button
+                  testID="editor-preview-button"
+                  variant="secondary"
+                  size="lg"
+                  fullWidth
+                  leadingIcon={Eye}
+                  label={t('preview.short')}
+                  onPress={preview}
+                />
+              </View>
+              <View style={styles.flex}>
+                <Button
+                  testID="editor-issue"
+                  variant="primary"
+                  size="lg"
+                  fullWidth
+                  leadingIcon={Send}
+                  label={t('share.send')}
+                  onPress={send}
+                />
+              </View>
+            </View>
           </>
         )}
       </View>
 
+      <NumberingSheet
+        ref={numberingSheet}
+        type={type}
+        issueDate={draft.issueDate}
+      />
+      <ShareSheet
+        ref={shareSheet}
+        onShared={() => {
+          leaving.current = true;
+          navigation.replace('DocumentDetail', { id });
+        }}
+      />
       <LineSheet
         ref={lineSheet}
         line={editingLine.line}
@@ -1010,6 +1067,17 @@ const styles = StyleSheet.create(theme => ({
   included: {
     paddingHorizontal: theme.size.gutter,
     paddingBottom: theme.space[1],
+  },
+  footerRow: {
+    flexDirection: 'row',
+    gap: theme.space[2],
+  },
+  previewButton: {
+    flexBasis: '36%',
+  },
+  change: {
+    paddingHorizontal: theme.space[1],
+    borderRadius: theme.radius.xs,
   },
   numberHint: {
     flexDirection: 'row',

@@ -79,6 +79,8 @@ name: 01_onboarding_invoice_payment
 - assertVisible: "£155.70"
 - tapOn:
     id: "editor-issue"
+- tapOn:
+    id: "share-mark-sent"
 - extendedWaitUntil:
     visible: "INV-0001"
     timeout: 10000

@@ -1,0 +1,44 @@
+# Acceptance (Phase 4): payment details → live preview → template switch → save PDF.
+appId: com.invoiceapp.dev
+name: 04_payment_details_preview_share
+---
+- launchApp
+- extendedWaitUntil:
+    visible: "Documents"
+    timeout: 20000
+
+# Add bank details in Settings.
+- tapOn: "Open menu"
+- tapOn: "Settings"
+- tapOn:
+    id: "settings-payments"
+- tapOn: "Add payment method"
+- tapOn:
+    id: "payment-field-sortCode"
+- inputText: "040004"
+- tapOn:
+    id: "payment-field-accountNumber"
+- inputText: "12345678"
+- hideKeyboard
+- tapOn:
+    id: "payment-method-save"
+- assertVisible: "04-00-04"
+- tapOn: "Back"
+
+# The invoice preview shows them; switch template and save the PDF.
+- tapOn: "Open menu"
+- tapOn: "All"
+- tapOn: "INV-0001.*"
+- tapOn:
+    id: "detail-preview"
+- extendedWaitUntil:
+    visible: "Page 1 of 1"
+    timeout: 15000
+- tapOn: "Minimal"
+- tapOn:
+    id: "preview-send"
+- tapOn:
+    id: "share-save"
+- extendedWaitUntil:
+    visible: "Saved to Downloads.*"
+    timeout: 15000

@@ -11,6 +11,7 @@ import {
   MoreHorizontal,
   PackageCheck,
   Pencil,
+  Send,
   ThumbsDown,
   ThumbsUp,
   Trash2,
@@ -61,6 +62,9 @@ import {
   type SheetRef,
 } from '@/ui/primitives';
 import { toast } from '@/ui/toast/store';
+
+import { DocumentThumbnail } from '../preview/DocumentThumbnail';
+import { ShareSheet, type ShareSheetRef } from '../share/ShareSheet';
 
 import { RecordPaymentSheet, type PaymentInput } from './RecordPaymentSheet';
 import {
@@ -113,6 +117,7 @@ export function DocumentDetailScreen({
   const paymentSheet = useRef<SheetRef>(null);
   const moreSheet = useRef<SheetRef>(null);
   const voidSheet = useRef<SheetRef>(null);
+  const shareSheet = useRef<ShareSheetRef>(null);
   const [, force] = useState(0);
 
   const { data } = useLiveQuery<Loaded | null>(
@@ -321,6 +326,11 @@ export function DocumentDetailScreen({
           </Text>
         </View>
 
+        <DocumentThumbnail
+          id={id}
+          onPress={() => navigation.push('DocumentPreview', { id })}
+        />
+
         <Surface style={styles.card}>
           <ListRow
             title={clientName}
@@ -514,19 +524,36 @@ export function DocumentDetailScreen({
         </View>
       </Animated.ScrollView>
 
-      {primary ? (
+      {status !== 'VOID' ? (
         <View style={[styles.footer, { paddingBottom: insets.bottom + 12 }]}>
-          <Button
-            testID={`detail-${primary}`}
-            variant="primary"
-            size="lg"
-            fullWidth
-            leadingIcon={ACTION_ICONS[primary]}
-            label={t(actionKey(primary))}
-            onPress={() => run(primary)}
-          />
+          <View style={primary ? styles.sendSecondary : styles.flex}>
+            <Button
+              testID="detail-send"
+              variant={primary ? 'secondary' : 'primary'}
+              size="lg"
+              fullWidth
+              leadingIcon={Send}
+              label={t('share.send')}
+              onPress={() => shareSheet.current?.present(id)}
+            />
+          </View>
+          {primary ? (
+            <View style={styles.flex}>
+              <Button
+                testID={`detail-${primary}`}
+                variant="primary"
+                size="lg"
+                fullWidth
+                leadingIcon={ACTION_ICONS[primary]}
+                label={t(actionKey(primary))}
+                onPress={() => run(primary)}
+              />
+            </View>
+          ) : null}
         </View>
       ) : null}
+
+      <ShareSheet ref={shareSheet} />
 
       <RecordPaymentSheet
         ref={paymentSheet}
@@ -609,7 +636,12 @@ const styles = StyleSheet.create(theme => ({
     borderRadius: 4,
     backgroundColor: theme.colors.border.strong,
   },
+  sendSecondary: {
+    flexBasis: '38%',
+  },
   footer: {
+    flexDirection: 'row',
+    gap: theme.space[2],
     paddingHorizontal: theme.size.gutter,
     paddingTop: theme.space[3],
     borderTopWidth: StyleSheet.hairlineWidth,

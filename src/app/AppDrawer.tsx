@@ -20,8 +20,8 @@ import { ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StyleSheet } from 'react-native-unistyles';
 
+import { useProfile } from '@/data/ProfileProvider';
 import { Avatar, Icon, Text, Touchable, type IconTone } from '@/ui/primitives';
-import { toast } from '@/ui/toast/store';
 
 import type { DrawerParamList, InboxView } from './navigation';
 
@@ -100,6 +100,8 @@ function NavItem({
 export function AppDrawer({ state, navigation }: DrawerContentComponentProps) {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
+  const { profile } = useProfile();
+  const businessName = profile.name || t('business.title');
   const current = state.routes[state.index];
   const currentView =
     current?.name === 'Inbox'
@@ -108,16 +110,28 @@ export function AppDrawer({ state, navigation }: DrawerContentComponentProps) {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
-        <Avatar name="Your Business" size={28} />
+      <Touchable
+        feedback="highlight"
+        style={styles.header}
+        accessibilityRole="button"
+        accessibilityLabel={t('business.title')}
+        onPress={() => {
+          navigation.closeDrawer();
+          navigation.getParent()?.navigate('BusinessProfile');
+        }}
+      >
+        <Avatar name={businessName} size={28} />
         <Text variant="bodyMedium" numberOfLines={1} style={styles.flex}>
-          Your Business
+          {businessName}
         </Text>
-      </View>
+      </Touchable>
 
       <Touchable
         feedback="highlight"
-        onPress={() => toast.show({ message: t('common.comingSoon') })}
+        onPress={() => {
+          navigation.closeDrawer();
+          navigation.getParent()?.navigate('CommandPalette');
+        }}
         accessibilityRole="search"
         accessibilityLabel={t('common.search')}
         style={styles.search}
