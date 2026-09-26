@@ -8,10 +8,12 @@
     "start": "react-native start",
     "test": "jest",
     "typecheck": "tsc --noEmit",
-    "format": "prettier --write \"src/**/*.{ts,tsx}\" index.js"
+    "format": "prettier --write \"src/**/*.{ts,tsx}\" index.js",
+    "e2e": "~/.maestro/bin/maestro test .maestro"
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^5.2.14",
+    "@op-engineering/op-sqlite": "^18.2.5",
     "@react-native/new-app-screen": "0.87.1",
     "@react-navigation/drawer": "^7.14.2",
     "@react-navigation/native": "^7.4.1",
@@ -64,5 +66,9 @@
     "android": {
       "javaPackageName": "com.invoiceapp.dev.specs"
     }
+  },
+  "op-sqlite": {
+    "fts5": true,
+    "performanceMode": true
   }
 }

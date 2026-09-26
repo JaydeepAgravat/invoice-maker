@@ -6,6 +6,7 @@ import { ScrollView, View, useWindowDimensions } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
 
 import type { DrawerProps } from '@/app/navigation';
+import { DevDataTools } from '@/features/dev/DevDataTools';
 import { SUPPORTED_LANGUAGES, setLanguage, type Language } from '@/i18n';
 import { PrefKeys, prefs } from '@/lib/storage';
 import { haptics } from '@/ui/haptics';
@@ -145,6 +146,8 @@ export function SettingsScreen({ navigation }: DrawerProps<'Settings'>) {
                 showChevron
                 onPress={() => root.navigate('KitchenSink')}
               />
+              <Divider inset={52} />
+              <DevDataTools />
             </Surface>
           </>
         ) : null}

@@ -11,6 +11,7 @@ import { SystemBars } from 'react-native-edge-to-edge';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
+import { DatabaseGate } from '@/data/DatabaseGate';
 import { ToastHost } from '@/ui/toast/ToastHost';
 
 import { RootNavigator } from './RootNavigator';
@@ -41,7 +42,9 @@ export function App() {
         <SystemBars style={theme.dark ? 'light' : 'dark'} />
         <NavigationContainer theme={navigationTheme}>
           <BottomSheetModalProvider>
-            <RootNavigator />
+            <DatabaseGate>
+              <RootNavigator />
+            </DatabaseGate>
             <ToastHost />
           </BottomSheetModalProvider>
         </NavigationContainer>

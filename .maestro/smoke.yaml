@@ -1,0 +1,22 @@
+# Smoke test: app launches, inbox renders, New sheet opens and closes with Back,
+# drawer navigates to Settings. Run: ~/.maestro/bin/maestro test .maestro
+appId: com.invoiceapp.dev
+---
+- launchApp
+- extendedWaitUntil:
+    visible: "Documents"
+    timeout: 20000
+- assertVisible: "No documents yet"
+- tapOn:
+    id: "new-document"
+- assertVisible: "Create"
+- assertVisible: "Invoice"
+- assertVisible: "Statement of account"
+- back
+- assertNotVisible: "Statement of account"
+- assertVisible: "Documents"
+- tapOn: "Open menu"
+- assertVisible: "Overdue"
+- tapOn: "Settings"
+- assertVisible: "Appearance"
+- assertVisible: "Phone language"
