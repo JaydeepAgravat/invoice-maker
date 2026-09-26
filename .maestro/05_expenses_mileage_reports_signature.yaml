@@ -1,0 +1,82 @@
+# Acceptance (Phase 5): expense → trip → report totals → client signature.
+appId: com.invoiceapp.dev
+name: 05_expenses_mileage_reports_signature
+---
+- launchApp
+- extendedWaitUntil:
+    visible: "Documents"
+    timeout: 20000
+
+# Expense: £40.00 fuel.
+- tapOn: "Open menu"
+- tapOn: "Expenses"
+- tapOn:
+    id: "new-expense"
+- tapOn:
+    id: "expense-amount"
+- inputText: "40"
+- hideKeyboard
+- tapOn: "Fuel"
+- tapOn:
+    id: "expense-vendor"
+- inputText: "Shell"
+- hideKeyboard
+- tapOn:
+    id: "expense-save"
+- assertVisible: "Shell"
+- assertVisible: "£40.00"
+
+# Trip: 10 mi at the HMRC 45p rate = £4.50.
+- tapOn: "Open menu"
+- tapOn: "Mileage"
+- tapOn:
+    id: "new-trip"
+- tapOn:
+    id: "trip-from"
+- inputText: "Office"
+- tapOn:
+    id: "trip-to"
+- inputText: "Site"
+- tapOn:
+    id: "trip-distance"
+- inputText: "10"
+- hideKeyboard
+- tapOn:
+    id: "trip-save"
+- assertVisible: "Office → Site"
+- assertVisible: "£4.50"
+
+# Reports: income £77.85 (flow 01) − £40.00 − £4.50 = £33.35.
+- tapOn: "Open menu"
+- tapOn: "Reports"
+- extendedWaitUntil:
+    visible: "£33.35"
+    timeout: 10000
+- assertVisible: "Top clients"
+
+# The accepted change order gets the client's signature.
+- tapOn: "Open menu"
+- tapOn: "All"
+- tapOn: ".*CO-0001.*"
+- scrollUntilVisible:
+    element:
+      id: "detail-sign"
+- tapOn:
+    id: "detail-sign"
+- swipe:
+    start: 25%, 40%
+    end: 75%, 45%
+    duration: 600
+- swipe:
+    start: 30%, 50%
+    end: 60%, 35%
+    duration: 400
+- tapOn:
+    id: "signature-name"
+- inputText: "Ana Ruiz"
+- hideKeyboard
+- tapOn:
+    id: "signature-save"
+- extendedWaitUntil:
+    visible: "Signed by Ana Ruiz"
+    timeout: 10000

@@ -204,7 +204,11 @@ export function InboxScreen({ navigation, route }: DrawerProps<'Inbox'>) {
     if (!outstanding) {
       return null;
     }
-    return { outstanding, overdue: pick(data.totals.overdue) };
+    return {
+      outstanding,
+      overdue: pick(data.totals.overdue),
+      paid: pick(data.totals.paidThisMonth),
+    };
   }, [data, f]);
 
   const renderItem = useCallback(
@@ -309,6 +313,28 @@ export function InboxScreen({ navigation, route }: DrawerProps<'Inbox'>) {
                     tone={summary.overdue ? 'danger' : 'tertiary'}
                   >
                     {summary.overdue?.text ?? f.money(0)}
+                  </Text>
+                </Touchable>
+                <Touchable
+                  feedback="highlight"
+                  style={styles.stat}
+                  onPress={() => navigation.setParams({ view: 'paid' })}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${t('inbox.paidThisMonth')}, ${
+                    summary.paid?.text ?? f.money(0)
+                  }`}
+                >
+                  <Text variant="caption" tone="secondary" numberOfLines={1}>
+                    {t('inbox.paidThisMonth')}
+                  </Text>
+                  <Text
+                    variant="title2"
+                    tabular
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                    tone={summary.paid ? 'primary' : 'tertiary'}
+                  >
+                    {summary.paid?.text ?? f.money(0)}
                   </Text>
                 </Touchable>
               </View>

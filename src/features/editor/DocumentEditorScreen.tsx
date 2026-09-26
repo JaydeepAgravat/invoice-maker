@@ -76,6 +76,7 @@ import { CurrencySheet } from './CurrencySheet';
 import { DiscountSheet } from './DiscountSheet';
 import { LineSheet } from './LineSheet';
 import { NumberingSheet } from './NumberingSheet';
+import { PhotoStrip } from './PhotoStrip';
 import { TextSheet } from './TextSheet';
 import { ShareSheet, type ShareSheetRef } from '../share/ShareSheet';
 
@@ -733,6 +734,13 @@ export function DocumentEditorScreen({
               </>
             ) : null}
           </Surface>
+        ) : null}
+
+        {!isStatement ? (
+          <>
+            <SectionHeader title={t('photos.title')} />
+            <PhotoStrip documentId={id} />
+          </>
         ) : null}
 
         {/* Options */}

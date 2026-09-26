@@ -11,6 +11,7 @@ import {
   MoreHorizontal,
   PackageCheck,
   Pencil,
+  PenLine,
   Send,
   ThumbsDown,
   ThumbsUp,
@@ -43,6 +44,7 @@ import {
   statusOf,
   type DocumentRecord,
 } from '@/data/repositories/documents';
+import { getClientSignature } from '@/data/repositories/attachments';
 import { contractValue } from '@/domain/changeOrder';
 import { allowedActions } from '@/domain/status';
 import { useFormat } from '@/lib/format';
@@ -64,6 +66,7 @@ import {
 import { toast } from '@/ui/toast/store';
 
 import { DocumentThumbnail } from '../preview/DocumentThumbnail';
+import { SignatureImage } from '../signature/SignatureImage';
 import { ShareSheet, type ShareSheetRef } from '../share/ShareSheet';
 
 import { RecordPaymentSheet, type PaymentInput } from './RecordPaymentSheet';
@@ -81,6 +84,7 @@ type Loaded = {
   derived: DocumentRecord[];
   source: DocumentRecord | null;
   activity: Awaited<ReturnType<typeof listActivity>>;
+  signature: Awaited<ReturnType<typeof getClientSignature>>;
 };
 
 const ACTION_ICONS: Record<UiAction, LucideIcon> = {
@@ -133,6 +137,7 @@ export function DocumentDetailScreen({
           ? await getDocument(db, doc.sourceDocumentId)
           : null,
         activity: await listActivity(db, id),
+        signature: await getClientSignature(db, id),
       };
     },
     [id],
@@ -146,8 +151,16 @@ export function DocumentDetailScreen({
   if (!data) {
     return <View style={styles.screen} />;
   }
-  const { doc, derived, source, activity } = data;
+  const { doc, derived, source, activity, signature } = data;
   const status = statusOf(doc, today);
+  const signable =
+    (doc.type === 'ESTIMATE' ||
+      doc.type === 'CHANGE_ORDER' ||
+      doc.type === 'DELIVERY_NOTE') &&
+    !!doc.number &&
+    status !== 'VOID' &&
+    status !== 'DECLINED' &&
+    status !== 'CONVERTED';
   const actions = allowedActions(doc.type, status).filter(
     (a): a is UiAction =>
       a !== 'SEND' && a !== 'EDIT' && a !== 'DELETE' && a !== 'MARK_SENT',
@@ -402,6 +415,40 @@ export function DocumentDetailScreen({
           </>
         ) : null}
 
+        {signature ? (
+          <>
+            <SectionHeader title={t('signature.section')} />
+            <Surface style={styles.signed}>
+              <SignatureImage path={signature.path} width={220} height={72} />
+              <Text variant="caption" tone="secondary">
+                {[
+                  signature.name,
+                  new Intl.DateTimeFormat(f.locale, {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  }).format(signature.signedAt),
+                ]
+                  .filter(Boolean)
+                  .join(' · ')}
+              </Text>
+            </Surface>
+          </>
+        ) : signable ? (
+          <Surface style={[styles.card, styles.gap]}>
+            <ListRow
+              testID="detail-sign"
+              leadingIcon={PenLine}
+              title={t('signature.collect')}
+              subtitle={t('signature.collectHint')}
+              showChevron
+              onPress={() => navigation.push('Signature', { documentId: id })}
+            />
+          </Surface>
+        ) : null}
+
         {doc.type === 'INVOICE' && doc.payments.length ? (
           <>
             <SectionHeader title={t('detail.payments')} />
@@ -635,6 +682,16 @@ const styles = StyleSheet.create(theme => ({
     height: 7,
     borderRadius: 4,
     backgroundColor: theme.colors.border.strong,
+  },
+  signed: {
+    marginHorizontal: theme.size.gutter,
+    padding: theme.space[4],
+    gap: theme.space[2],
+    alignItems: 'flex-start',
+    backgroundColor: '#FFFFFF',
+  },
+  gap: {
+    marginTop: theme.space[4],
   },
   sendSecondary: {
     flexBasis: '38%',

@@ -5,6 +5,7 @@ import { shareMessage } from '../messages';
 import { accentPalette, buildModel, TEMPLATE_IDS, type PdfModel } from '../model';
 import { qrSvg } from '../qr';
 import { esc, renderHtml } from '../render';
+import { renderReportHtml } from '../reportHtml';
 
 import { scenario } from './fixtures';
 
@@ -180,5 +181,48 @@ describe('share message', () => {
       }
     }
     expect(shareMessage('es', 'ESTIMATE', v).body).toContain('válido hasta');
+  });
+});
+
+describe('report PDF', () => {
+  it('renders every section with escaped text', () => {
+    const html = renderReportHtml({
+      report: {
+        period: { from: '2026-01-01', to: '2026-12-31' },
+        months: [{ month: '2026-09', income: 7785, expenses: 4000 }],
+        income: 7785,
+        invoiced: 15570,
+        credited: 0,
+        expenses: 4000,
+        expenseTax: 0,
+        mileage: 450,
+        mileageDistance: 10000,
+        profit: 3335,
+        byClient: [{ clientId: 'c', name: 'Acme <Ltd>', income: 7785 }, { clientId: null, name: null, income: 1 }],
+        taxCollected: [{ name: 'VAT', rate: 200000, amount: 2595, withholding: false }],
+        expensesByCategory: [{ category: 'FUEL', amount: 4000 }],
+        aging: { current: 7785, days1to30: 0, days31to60: 0, days61to90: 0, days90plus: 0 },
+        outstanding: 7785,
+      },
+      labels: {
+        title: 'Business report', period: '2026', generated: 'Generated', profit: 'Profit', income: 'Income',
+        expenses: 'Expenses', mileage: 'Mileage', invoiced: 'Invoiced', credited: 'Credited',
+        outstanding: 'Outstanding', byMonth: 'By month', month: 'Month', byClient: 'Clients', client: 'Client',
+        noClient: 'No client', taxCollected: 'Tax', tax: 'Tax', byCategory: 'Categories', category: 'Category',
+        aging: 'Aging', amount: 'Amount', agingBuckets: ['a', 'b', 'c', 'd', 'e'],
+        categoryName: c => `cat:${c}`, monthName: m => `m:${m}`, taxName: (n, r) => `${n} ${r / 10000}%`,
+      },
+      business: 'Smith & Co',
+      money: m => `£${(m / 100).toFixed(2)}`,
+      paper: 'LETTER',
+    });
+    expect(html).toContain('size: letter');
+    expect(html).toContain('Acme &lt;Ltd&gt;');
+    expect(html).toContain('No client');
+    expect(html).toContain('£33.35');
+    expect(html).toContain('cat:FUEL');
+    expect(html).toContain('VAT 20%');
+    expect(html).toContain('m:2026-09');
+    expect(html).not.toMatch(/undefined|NaN/);
   });
 });

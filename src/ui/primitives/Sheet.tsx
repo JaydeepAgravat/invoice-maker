@@ -1,9 +1,11 @@
 import {
   BottomSheetBackdrop,
+  BottomSheetFooter,
   BottomSheetModal,
   BottomSheetScrollView,
   BottomSheetView,
   type BottomSheetBackdropProps,
+  type BottomSheetFooterProps,
 } from '@gorhom/bottom-sheet';
 import {
   useCallback,
@@ -61,6 +63,7 @@ export function Sheet({
   const modal = useRef<BottomSheetModal>(null);
   const isOpen = useRef(false);
   const [open, setOpen] = useState(false);
+  const [footerHeight, setFooterHeight] = useState(0);
 
   useImperativeHandle(
     ref,
@@ -105,6 +108,25 @@ export function Sheet({
     [theme.colors.overlay.scrim],
   );
 
+  // Footer of scrollable sheets rides above the keyboard (gorhom footer), so
+  // a Save button is never hidden while typing.
+  const renderFooter = useCallback(
+    (props: BottomSheetFooterProps) => (
+      <BottomSheetFooter {...props}>
+        <View
+          onLayout={e => setFooterHeight(e.nativeEvent.layout.height)}
+          style={[
+            styles.footer,
+            { paddingBottom: insets.bottom + theme.space[3] },
+          ]}
+        >
+          {footer}
+        </View>
+      </BottomSheetFooter>
+    ),
+    [footer, insets.bottom, theme.space],
+  );
+
   const header = title ? (
     <View style={styles.header}>
       <Text
@@ -135,29 +157,26 @@ export function Sheet({
       handleIndicatorStyle={styles.handle}
       keyboardBehavior="interactive"
       keyboardBlurBehavior="restore"
-      android_keyboardInputMode="adjustResize"
+      // Edge-to-edge windows never resize for the keyboard, so the sheet
+      // must offset itself (and its footer) instead.
+      android_keyboardInputMode="adjustPan"
       overrideReduceMotion={ReduceMotion.System}
       accessibilityLabel={title}
+      footerComponent={scrollable && footer ? renderFooter : undefined}
+      topInset={insets.top + theme.space[2]}
     >
       {scrollable ? (
         <>
           <View style={styles.content}>{header}</View>
           <BottomSheetScrollView
             keyboardShouldPersistTaps="handled"
-            contentContainerStyle={styles.scroll}
+            contentContainerStyle={[
+              styles.scroll,
+              footer ? { paddingBottom: footerHeight + theme.space[4] } : null,
+            ]}
           >
             {children}
           </BottomSheetScrollView>
-          {footer ? (
-            <View
-              style={[
-                styles.footer,
-                { paddingBottom: insets.bottom + theme.space[3] },
-              ]}
-            >
-              {footer}
-            </View>
-          ) : null}
         </>
       ) : (
         <BottomSheetView

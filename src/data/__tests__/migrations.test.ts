@@ -5,7 +5,7 @@ import { uuidv7 } from '../ids';
 describe('migrate', () => {
   it('creates the schema once and is idempotent', async () => {
     const db = openNodeDatabase();
-    expect(await migrate(db)).toEqual([1]);
+    expect(await migrate(db)).toEqual([1, 2]);
     expect(await migrate(db)).toEqual([]);
     const { rows } = await db.execute(
       "SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name",

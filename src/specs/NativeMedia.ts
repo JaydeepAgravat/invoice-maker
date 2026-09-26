@@ -19,6 +19,10 @@ export interface Spec extends TurboModule {
   takePhoto(options: MediaOptions): Promise<MediaFile | null>;
   /** Write text (e.g. an SVG signature) to a private file. */
   writeFile(folder: string, name: string, contents: string): Promise<string>;
+  /** Read a small private text file (e.g. a signature SVG). */
+  readFile(path: string): Promise<string>;
+  /** Write an export (CSV) to the shareable cache; returns its path. */
+  writeExport(name: string, contents: string): Promise<string>;
   deleteFile(path: string): Promise<boolean>;
 }
 

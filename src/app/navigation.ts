@@ -33,6 +33,9 @@ export type RootStackParamList = {
   ItemEditor: { id?: string } | undefined;
   CommandPalette: undefined;
   BusinessProfile: undefined;
+  ExpenseEditor: { id?: string } | undefined;
+  TripEditor: { id?: string } | undefined;
+  Signature: { documentId?: string };
   PaymentMethods: undefined;
   PaymentMethodEditor: { id?: string } | undefined;
   KitchenSink: undefined;

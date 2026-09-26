@@ -166,12 +166,39 @@ class MediaModule(context: ReactApplicationContext) :
     }
   }
 
+  override fun readFile(path: String, promise: Promise) {
+    io.execute {
+      try {
+        val file = File(path)
+        if (!inside(file)) throw SecurityException("Outside app storage")
+        promise.resolve(file.readText())
+      } catch (e: Exception) {
+        promise.reject("E_MEDIA", e)
+      }
+    }
+  }
+
+  override fun writeExport(name: String, contents: String, promise: Promise) {
+    io.execute {
+      try {
+        val dir = File(reactApplicationContext.cacheDir, "export").apply { mkdirs() }
+        val file = File(dir, name.replace(Regex("[\\\\/:*?\"<>|\n\r]"), "_"))
+        file.writeText(contents)
+        promise.resolve(file.absolutePath)
+      } catch (e: Exception) {
+        promise.reject("E_MEDIA", e)
+      }
+    }
+  }
+
+  private fun inside(file: File): Boolean =
+    file.canonicalPath.startsWith(reactApplicationContext.filesDir.canonicalPath) ||
+      file.canonicalPath.startsWith(reactApplicationContext.cacheDir.canonicalPath)
+
   override fun deleteFile(path: String, promise: Promise) {
     val file = File(path)
     // Only ever delete inside the app's own storage.
-    val inside = file.canonicalPath.startsWith(reactApplicationContext.filesDir.canonicalPath) ||
-      file.canonicalPath.startsWith(reactApplicationContext.cacheDir.canonicalPath)
-    promise.resolve(inside && file.delete())
+    promise.resolve(inside(file) && file.delete())
   }
 
   override fun invalidate() {

@@ -62,10 +62,16 @@ function ActionPanel({
     ],
   }));
 
+  // Hidden at rest so no sliver of colour shows at the row's edges.
+  const panelStyle = useAnimatedStyle(() => ({
+    opacity: progress.value > 0.01 ? 1 : 0,
+  }));
+
   return (
     <Animated.View
       style={[
         styles.panel,
+        panelStyle,
         { backgroundColor: bg },
         side === 'left' ? styles.alignStart : styles.alignEnd,
       ]}

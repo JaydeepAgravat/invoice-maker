@@ -1,6 +1,7 @@
 import type { Database } from '../db/types';
 
 import { migration001 } from './001_initial';
+import { migration002 } from './002_money';
 
 export type Migration = {
   version: number;
@@ -11,6 +12,7 @@ export type Migration = {
 /** Forward-only. Never edit a released migration; add a new one. */
 export const MIGRATIONS: readonly Migration[] = [
   { version: 1, name: 'initial', statements: migration001 },
+  { version: 2, name: 'money', statements: migration002 },
 ];
 
 export const LATEST_VERSION = MIGRATIONS[MIGRATIONS.length - 1]!.version;

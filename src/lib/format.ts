@@ -42,6 +42,7 @@ export function useFormat() {
     const locale = profile.locale;
     return {
       locale,
+      currency: profile.currency,
       money: (
         minor: number,
         currency = profile.currency,

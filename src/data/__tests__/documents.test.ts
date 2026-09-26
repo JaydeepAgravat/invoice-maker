@@ -2,6 +2,7 @@ import type { Database } from '../db/types';
 import { createClient } from '../repositories/clients';
 import {
   recordShare,
+  setAppearance,
   documentsSharedInMonth,
   ActionNotAllowedError,
   applyAction,
@@ -713,5 +714,25 @@ describe('sharing', () => {
     expect(await documentsSharedInMonth(sdb, '2026-09')).toBe(2);
     expect(await documentsSharedInMonth(sdb, '2026-10')).toBe(0);
     await expect(recordShare(sdb, sclock, 'missing', 'x')).rejects.toThrow();
+  });
+});
+
+describe('appearance', () => {
+  it('changes template, colour and paper without a revision', async () => {
+    const env = await setupDb();
+    const doc = await createDraft(env.db, env.clock, 'INVOICE');
+    await setAppearance(env.db, env.clock, doc.id, {});
+    await setAppearance(env.db, env.clock, doc.id, {
+      templateId: 'bold',
+      accentColor: '#E93D82',
+      paperSize: 'LETTER',
+    });
+    const after = await getDocument(env.db, doc.id);
+    expect([after!.templateId, after!.accentColor, after!.paperSize, after!.revision]).toEqual([
+      'bold',
+      '#E93D82',
+      'LETTER',
+      doc.revision,
+    ]);
   });
 });

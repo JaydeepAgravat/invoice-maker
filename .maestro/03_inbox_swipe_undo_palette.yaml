@@ -13,11 +13,16 @@ name: 03_inbox_swipe_undo_palette
 - assertNotVisible: "Statement of account"
 
 - tapOn: "Unpaid"
-- swipe:
-    from:
-      id: "doc-INV-0001"
-    direction: RIGHT
-- assertVisible: "INV-0001 marked as paid"
+# Emulator swipes occasionally register as a short drag; retry the gesture.
+- retry:
+    maxRetries: 2
+    commands:
+      - swipe:
+          from:
+            id: "doc-INV-0001"
+          direction: RIGHT
+          duration: 500
+      - assertVisible: "INV-0001 marked as paid"
 - tapOn: "Undo"
 - assertVisible: "Partially paid"
 

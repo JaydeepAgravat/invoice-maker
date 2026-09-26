@@ -3,7 +3,6 @@ import {
   type DrawerContentComponentProps,
 } from '@react-navigation/drawer';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useTranslation } from 'react-i18next';
 import { useWindowDimensions } from 'react-native';
 import { useUnistyles } from 'react-native-unistyles';
 
@@ -20,7 +19,12 @@ import { ItemsScreen } from '@/features/items/ItemsScreen';
 import { PreviewScreen } from '@/features/preview/PreviewScreen';
 import { OnboardingScreen } from '@/features/onboarding/OnboardingScreen';
 import { CommandPaletteScreen } from '@/features/palette/CommandPaletteScreen';
-import { PlaceholderScreen } from '@/features/placeholder/PlaceholderScreen';
+import { ExpenseEditorScreen } from '@/features/expenses/ExpenseEditorScreen';
+import { ExpensesScreen } from '@/features/expenses/ExpensesScreen';
+import { MileageScreen } from '@/features/mileage/MileageScreen';
+import { TripEditorScreen } from '@/features/mileage/TripEditorScreen';
+import { ReportsScreen } from '@/features/reports/ReportsScreen';
+import { SignatureScreen } from '@/features/signature/SignatureScreen';
 import { BusinessProfileScreen } from '@/features/settings/BusinessProfileScreen';
 import { PaymentMethodEditorScreen } from '@/features/settings/PaymentMethodEditorScreen';
 import { PaymentMethodsScreen } from '@/features/settings/PaymentMethodsScreen';
@@ -38,7 +42,6 @@ const renderDrawer = (props: DrawerContentComponentProps) => (
 );
 
 function MainDrawer() {
-  const { t } = useTranslation();
   const { theme } = useUnistyles();
   const { width } = useWindowDimensions();
   const permanent = width >= breakpoints.lg;
@@ -64,30 +67,9 @@ function MainDrawer() {
       <Drawer.Screen name="Inbox" component={InboxScreen} />
       <Drawer.Screen name="Clients" component={ClientsScreen} />
       <Drawer.Screen name="Items" component={ItemsScreen} />
-      <Drawer.Screen name="Expenses">
-        {props => (
-          <PlaceholderScreen
-            title={t('nav.expenses')}
-            navigation={props.navigation}
-          />
-        )}
-      </Drawer.Screen>
-      <Drawer.Screen name="Mileage">
-        {props => (
-          <PlaceholderScreen
-            title={t('nav.mileage')}
-            navigation={props.navigation}
-          />
-        )}
-      </Drawer.Screen>
-      <Drawer.Screen name="Reports">
-        {props => (
-          <PlaceholderScreen
-            title={t('nav.reports')}
-            navigation={props.navigation}
-          />
-        )}
-      </Drawer.Screen>
+      <Drawer.Screen name="Expenses" component={ExpensesScreen} />
+      <Drawer.Screen name="Mileage" component={MileageScreen} />
+      <Drawer.Screen name="Reports" component={ReportsScreen} />
       <Drawer.Screen name="Settings" component={SettingsScreen} />
     </Drawer.Navigator>
   );
@@ -135,6 +117,21 @@ export function RootNavigator() {
         options={{ animation: 'slide_from_bottom' }}
       />
       <Stack.Screen name="PaymentMethods" component={PaymentMethodsScreen} />
+      <Stack.Screen
+        name="ExpenseEditor"
+        component={ExpenseEditorScreen}
+        options={{ animation: 'slide_from_bottom' }}
+      />
+      <Stack.Screen
+        name="TripEditor"
+        component={TripEditorScreen}
+        options={{ animation: 'slide_from_bottom' }}
+      />
+      <Stack.Screen
+        name="Signature"
+        component={SignatureScreen}
+        options={{ animation: 'slide_from_bottom', gestureEnabled: false }}
+      />
       <Stack.Screen
         name="PaymentMethodEditor"
         component={PaymentMethodEditorScreen}

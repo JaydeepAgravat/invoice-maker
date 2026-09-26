@@ -6,23 +6,32 @@ import { StyleSheet } from 'react-native-unistyles';
 import { Icon, Text, Touchable } from '@/ui/primitives';
 
 /** Extended floating button, bottom-right: always in thumb reach. */
-export function NewButton({ onPress }: { onPress: () => void }) {
+export function NewButton({
+  onPress,
+  label,
+  testID = 'new-document',
+}: {
+  onPress: () => void;
+  label?: string;
+  testID?: string;
+}) {
   const { t } = useTranslation();
+  const text = label ?? t('new.button');
   const insets = useSafeAreaInsets();
   return (
     <Touchable
-      testID="new-document"
+      testID={testID}
       onPress={onPress}
       feedback="both"
       scaleTo={0.95}
       haptic="light"
       accessibilityRole="button"
-      accessibilityLabel={t('new.button')}
+      accessibilityLabel={text}
       style={[styles.fab, { bottom: insets.bottom + 16 }]}
     >
       <Icon icon={Plus} size={20} tone="onAccent" strokeWidth={2} />
       <Text variant="bodyMedium" tone="onAccent">
-        {t('new.button')}
+        {text}
       </Text>
     </Touchable>
   );

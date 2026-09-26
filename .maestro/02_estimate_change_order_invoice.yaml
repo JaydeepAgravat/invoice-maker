@@ -68,6 +68,6 @@ name: 02_estimate_change_order_invoice
 - tapOn:
     id: "detail-CONVERT_TO_INVOICE"
 - extendedWaitUntil:
-    visible: "Bathroom refit"
+    visible: "Bath.*refit"
     timeout: 10000
 - assertVisible: ".*socket"

@@ -1,5 +1,5 @@
 import { usePreventRemove } from '@react-navigation/native';
-import { ImagePlus, Trash2, X } from 'lucide-react-native';
+import { ImagePlus, PenLine, Trash2, X } from 'lucide-react-native';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, KeyboardAvoidingView, ScrollView, View } from 'react-native';
@@ -30,6 +30,8 @@ import {
   type SheetRef,
 } from '@/ui/primitives';
 import { toast } from '@/ui/toast/store';
+
+import { SignatureImage } from '../signature/SignatureImage';
 
 type Form = Pick<
   BusinessProfile,
@@ -238,6 +240,33 @@ export function BusinessProfileScreen({
           />
         </View>
 
+        <SectionHeader title={t('signature.businessRow')} />
+        <Surface style={styles.card}>
+          {profile.signaturePath ? (
+            <Touchable
+              feedback="highlight"
+              style={styles.signature}
+              onPress={() => navigation.push('Signature', {})}
+              accessibilityRole="button"
+              accessibilityLabel={t('signature.businessTitle')}
+            >
+              <SignatureImage path={profile.signaturePath} width={200} height={64} />
+              <Text variant="caption" tone="accent">
+                {t('numbering.change')}
+              </Text>
+            </Touchable>
+          ) : (
+            <ListRow
+              testID="business-signature"
+              leadingIcon={PenLine}
+              title={t('signature.businessRow')}
+              subtitle={t('signature.businessRowHint')}
+              showChevron
+              onPress={() => navigation.push('Signature', {})}
+            />
+          )}
+        </Surface>
+
         <SectionHeader title={t('business.tax')} />
         <Surface style={styles.card}>
           <ListRow
@@ -350,6 +379,14 @@ const styles = StyleSheet.create(theme => ({
   },
   top: {
     marginTop: theme.space[4],
+  },
+  signature: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: theme.space[3],
+    borderRadius: theme.radius.lg,
+    backgroundColor: '#FFFFFF',
   },
   taxRow: {
     flexDirection: 'row',

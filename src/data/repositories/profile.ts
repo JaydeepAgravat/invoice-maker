@@ -47,6 +47,9 @@ export type BusinessProfile = {
   templateId: string;
   accentColor: string | null;
   font: string | null;
+  /** Null: use the country preset. */
+  mileageRate: number | null;
+  mileageUnit: 'km' | 'mi' | null;
 };
 
 const COLUMNS: Record<keyof BusinessProfile, string> = {
@@ -81,6 +84,8 @@ const COLUMNS: Record<keyof BusinessProfile, string> = {
   templateId: 'template_id',
   accentColor: 'accent_color',
   font: 'font',
+  mileageRate: 'mileage_rate_minor',
+  mileageUnit: 'mileage_unit',
 };
 
 const BOOLEAN_KEYS = new Set<keyof BusinessProfile>([
@@ -125,6 +130,8 @@ export async function getProfile(db: Executor): Promise<BusinessProfile> {
     templateId: reqStr(r.template_id),
     accentColor: str(r.accent_color),
     font: str(r.font),
+    mileageRate: num(r.mileage_rate_minor),
+    mileageUnit: str(r.mileage_unit) as BusinessProfile['mileageUnit'],
   };
 }
 
