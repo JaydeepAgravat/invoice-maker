@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="reminders_channel">Recordatorios</string>
+    <string name="widget_label">Pendiente</string>
+    <string name="widget_description">Lo que te deben tus clientes y un acceso rápido para facturar</string>
 </resources>

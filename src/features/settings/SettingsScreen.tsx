@@ -1,5 +1,5 @@
 import { useIsFocused, useNavigation } from '@react-navigation/native';
-import { Bell, Building2, Check, CloudUpload, CreditCard, Crown, LayoutGrid, Menu } from 'lucide-react-native';
+import { Bell, Building2, LayoutDashboard, LockKeyhole, Check, CloudUpload, CreditCard, Crown, LayoutGrid, Menu } from 'lucide-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, View, useWindowDimensions } from 'react-native';
@@ -7,6 +7,10 @@ import { StyleSheet } from 'react-native-unistyles';
 
 import type { DrawerProps } from '@/app/navigation';
 import { lastBackup } from '@/backup/service';
+import { APP_NAME } from '@/config';
+import NativeLock from '@/specs/NativeLock';
+import NativeWidget from '@/specs/NativeWidget';
+import { toast } from '@/ui/toast/store';
 import { setPro, useIsPro } from '@/billing/entitlement';
 import { ensureNotificationPermission } from '@/features/documents/RecurringSheet';
 import { useLiveQuery } from '@/data/live';
@@ -62,6 +66,25 @@ export function SettingsScreen({ navigation }: DrawerProps<'Settings'>) {
   // Re-read when returning from the Backup screen.
   useIsFocused();
   const backup = lastBackup();
+  const [lock, setLock] = useState(prefs.getBoolean(PrefKeys.appLock) ?? false);
+  const toggleLock = async (next: boolean) => {
+    if (!NativeLock) {
+      return;
+    }
+    if (next) {
+      if ((await NativeLock.status()) !== 'available') {
+        toast.show({ message: t('lock.noScreenLock'), tone: 'danger' });
+        return;
+      }
+      // Prove it works before relying on it.
+      if (!(await NativeLock.authenticate(t('lock.title', { app: APP_NAME }), t('lock.subtitle')))) {
+        return;
+      }
+    }
+    prefs.set(PrefKeys.appLock, next);
+    NativeLock.setSecureRecents(next);
+    setLock(next);
+  };
   const toggleOverdue = async (next: boolean) => {
     if (next && !(await ensureNotificationPermission())) {
       return;
@@ -148,6 +171,40 @@ export function SettingsScreen({ navigation }: DrawerProps<'Settings'>) {
                 value={overdue}
                 onValueChange={toggleOverdue}
                 accessibilityLabel={t('reminders.overdueSetting')}
+              />
+            }
+          />
+        </Surface>
+
+        <SectionHeader title={t('settings.homeScreen')} />
+        <Surface style={styles.card}>
+          <ListRow
+            testID="settings-widget"
+            leadingIcon={LayoutDashboard}
+            title={t('settings.addWidget')}
+            subtitle={t('settings.addWidgetHint')}
+            onPress={async () => {
+              const ok = await NativeWidget?.requestPin().catch(() => false);
+              if (!ok) {
+                toast.show({ message: t('settings.widgetManual') });
+              }
+            }}
+          />
+        </Surface>
+
+        <SectionHeader title={t('settings.security')} />
+        <Surface style={styles.card}>
+          <ListRow
+            testID="settings-lock"
+            leadingIcon={LockKeyhole}
+            title={t('lock.setting')}
+            subtitle={t('lock.settingHint')}
+            onPress={() => toggleLock(!lock)}
+            trailing={
+              <Switch
+                value={lock}
+                onValueChange={toggleLock}
+                accessibilityLabel={t('lock.setting')}
               />
             }
           />

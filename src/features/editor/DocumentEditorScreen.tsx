@@ -19,7 +19,7 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { View } from 'react-native';
+import { PixelRatio, useWindowDimensions, View } from 'react-native';
 import Animated, {
   FadeIn,
   FadeOut,
@@ -78,6 +78,8 @@ import { LineSheet } from './LineSheet';
 import { NumberingSheet } from './NumberingSheet';
 import { PhotoStrip } from './PhotoStrip';
 import { TextSheet } from './TextSheet';
+import { PdfPages } from '../preview/PdfPages';
+import { usePdfPreview } from '../preview/usePdfPreview';
 import { ShareSheet, type ShareSheetRef } from '../share/ShareSheet';
 
 const AUTOSAVE_MS = 400;
@@ -100,6 +102,9 @@ export function DocumentEditorScreen({
   const f = useFormat();
   const { profile } = useProfile();
   const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
+  // Tablets: the real PDF updates beside the form as you type.
+  const wide = width >= 1000;
   const today = clock.today();
 
   const { data: record } = useLiveQuery(db => getDocument(db, id), [id]);
@@ -420,442 +425,471 @@ export function DocumentEditorScreen({
         }
       />
 
-      <Animated.ScrollView
-        onScroll={onScroll}
-        scrollEventThrottle={16}
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={[
-          styles.content,
-          { paddingBottom: insets.bottom + 120 },
-        ]}
-      >
-        {isIssued ? (
-          <View style={styles.banner}>
-            <Text variant="callout" tone="secondary">
-              {t('editor.issuedBanner', { revision: record.revision + 2 })}
-            </Text>
-          </View>
-        ) : null}
-
-        {/* Client */}
-        <Touchable
-          testID="editor-client"
-          feedback="highlight"
-          onPress={() => clientSheet.current?.present()}
-          accessibilityRole="button"
-          accessibilityLabel={
-            client
-              ? `${partyLabel}: ${client.name}`
-              : t(
-                  type === 'PURCHASE_ORDER'
-                    ? 'editor.addParty.supplier'
-                    : 'editor.addParty.client',
-                )
-          }
-          style={styles.clientCard}
-        >
-          {client ? (
-            <>
-              <Avatar name={client.name} size={40} />
-              <View style={styles.flex}>
-                <Text variant="caption" tone="tertiary">
-                  {partyLabel}
+      <View style={wide ? styles.split : styles.flex}>
+        <View style={styles.flex}>
+          <Animated.ScrollView
+            onScroll={onScroll}
+            scrollEventThrottle={16}
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={[
+              styles.content,
+              { paddingBottom: insets.bottom + 120 },
+            ]}
+          >
+            {isIssued ? (
+              <View style={styles.banner}>
+                <Text variant="callout" tone="secondary">
+                  {t('editor.issuedBanner', { revision: record.revision + 2 })}
                 </Text>
-                <Text variant="headline" numberOfLines={1}>
-                  {client.name}
-                </Text>
-                {client.emails[0] || client.company ? (
-                  <Text variant="caption" tone="secondary" numberOfLines={1}>
-                    {[client.company, client.emails[0]]
-                      .filter(Boolean)
-                      .join(' · ')}
-                  </Text>
-                ) : null}
               </View>
-            </>
-          ) : (
-            <>
-              <View style={styles.addCircle}>
-                <Icon icon={UserPlus} size={20} tone="accent" />
-              </View>
-              <Text variant="bodyMedium" tone="accent">
-                {t(
-                  type === 'PURCHASE_ORDER'
-                    ? 'editor.addParty.supplier'
-                    : 'editor.addParty.client',
-                )}
-              </Text>
-            </>
-          )}
-        </Touchable>
+            ) : null}
 
-        {/* Dates */}
-        <Surface style={styles.card}>
-          {isStatement ? (
-            <>
-              {dateRow(
-                'statementFrom',
-                dateLabels.statementFrom,
-                draft.statementFrom,
-              )}
-              <Divider inset={52} />
-              {dateRow(
-                'statementTo',
-                dateLabels.statementTo,
-                draft.statementTo,
-              )}
-            </>
-          ) : (
-            <>
-              {dateRow('issueDate', dateLabels.issueDate, draft.issueDate)}
-              {type === 'INVOICE' ? (
-                <>
-                  <Divider inset={52} />
-                  {dateRow(
-                    'dueDate',
-                    dateLabels.dueDate,
-                    draft.dueDate,
-                    draft.termsDays === 0
-                      ? t('terms.onReceipt')
-                      : draft.termsDays
-                      ? t('terms.netDays', { count: draft.termsDays })
-                      : undefined,
-                  )}
-                </>
-              ) : null}
-              {type === 'ESTIMATE' || type === 'CHANGE_ORDER' ? (
-                <>
-                  <Divider inset={52} />
-                  {dateRow(
-                    'validUntil',
-                    dateLabels.validUntil,
-                    draft.validUntil,
-                  )}
-                </>
-              ) : null}
-              {showSupplyDate &&
-              (type === 'INVOICE' ||
-                type === 'RECEIPT' ||
-                type === 'DELIVERY_NOTE') ? (
-                <>
-                  <Divider inset={52} />
-                  {dateRow(
-                    'supplyDate',
-                    dateLabels.supplyDate,
-                    draft.supplyDate,
-                  )}
-                </>
-              ) : null}
-            </>
-          )}
-        </Surface>
-
-        {/* Lines */}
-        {isStatement ? (
-          <View style={styles.banner}>
-            <Text variant="callout" tone="secondary">
-              {t('editor.statementNote')}
-            </Text>
-          </View>
-        ) : (
-          <>
-            <SectionHeader title={t('editor.items')} />
-            <Surface style={styles.card}>
-              {draft.lines.map((line, index) => {
-                const res = totals?.lines[index];
-                const sub = lineSummary(
-                  t,
-                  f.money,
-                  f.locale,
-                  line,
-                  draft.currency,
-                  {
-                    prices: priced,
-                  },
-                );
-                return (
-                  <View key={line.id ?? index}>
-                    {index > 0 ? <Divider inset={16} /> : null}
-                    <SwipeRow
-                      right={{
-                        label: t('actions.delete'),
-                        icon: Trash2,
-                        tone: 'danger',
-                        onTrigger: () => removeLine(index),
-                      }}
-                    >
-                      <ListRow
-                        testID={`line-row-${index}`}
-                        title={line.name}
-                        subtitle={sub}
-                        value={
-                          priced && res
-                            ? f.money(
-                                draft.pricesIncludeTax ? res.taxable : res.net,
-                                draft.currency,
-                              )
-                            : undefined
-                        }
-                        meta={
-                          line.kind === 'CHARGE'
-                            ? t('editor.charge')
-                            : line.discount
-                            ? t('editor.discounted')
-                            : undefined
-                        }
-                        onPress={() => openLine(index)}
-                      />
-                    </SwipeRow>
-                  </View>
-                );
-              })}
-              {draft.lines.length > 0 ? <Divider /> : null}
-              <ListRow
-                testID="add-line"
-                leading={
-                  <View style={styles.plus}>
-                    <Icon icon={Plus} size={16} tone="accent" strokeWidth={2} />
-                  </View>
-                }
-                title={t('editor.addItem')}
-                onPress={() => openLine(null)}
-              />
-              {priced ? (
-                <>
-                  <Divider inset={52} />
-                  <ListRow
-                    leadingIcon={Truck}
-                    title={t('editor.addCharge')}
-                    subtitle={t('editor.addChargeHint')}
-                    onPress={() => {
-                      setEditingLine(prev => ({
-                        nonce: prev.nonce + 1,
-                        index: null,
-                        line: {
-                          name: t('editor.shipping'),
-                          quantity: 1000,
-                          unitPrice: 0,
-                          taxes: defaultTaxes,
-                          kind: 'CHARGE',
-                        },
-                      }));
-                      lineSheet.current?.present();
-                    }}
-                  />
-                </>
-              ) : null}
-            </Surface>
-          </>
-        )}
-
-        {/* Totals */}
-        {priced && totals && !isStatement ? (
-          <Surface style={[styles.card, styles.totals]}>
-            <TotalRow
-              label={t('totals.subtotal')}
-              value={f.money(totals.subtotal, draft.currency)}
-            />
+            {/* Client */}
             <Touchable
+              testID="editor-client"
               feedback="highlight"
-              onPress={() => discountSheet.current?.present()}
-              style={styles.totalTouch}
+              onPress={() => clientSheet.current?.present()}
               accessibilityRole="button"
+              accessibilityLabel={
+                client
+                  ? `${partyLabel}: ${client.name}`
+                  : t(
+                      type === 'PURCHASE_ORDER'
+                        ? 'editor.addParty.supplier'
+                        : 'editor.addParty.client',
+                    )
+              }
+              style={styles.clientCard}
             >
-              <TotalRow
-                label={
-                  draft.discount?.type === 'PERCENT'
-                    ? `${t('document.discount')} ${rateToPercent(
-                        draft.discount.rate,
-                      )}%`
-                    : t('document.discount')
-                }
-                value={
-                  totals.documentDiscount
-                    ? `−${f.money(totals.documentDiscount, draft.currency)}`
-                    : t('editor.addDiscount')
-                }
-                accent={!totals.documentDiscount}
-              />
+              {client ? (
+                <>
+                  <Avatar name={client.name} size={40} />
+                  <View style={styles.flex}>
+                    <Text variant="caption" tone="tertiary">
+                      {partyLabel}
+                    </Text>
+                    <Text variant="headline" numberOfLines={1}>
+                      {client.name}
+                    </Text>
+                    {client.emails[0] || client.company ? (
+                      <Text
+                        variant="caption"
+                        tone="secondary"
+                        numberOfLines={1}
+                      >
+                        {[client.company, client.emails[0]]
+                          .filter(Boolean)
+                          .join(' · ')}
+                      </Text>
+                    ) : null}
+                  </View>
+                </>
+              ) : (
+                <>
+                  <View style={styles.addCircle}>
+                    <Icon icon={UserPlus} size={20} tone="accent" />
+                  </View>
+                  <Text variant="bodyMedium" tone="accent">
+                    {t(
+                      type === 'PURCHASE_ORDER'
+                        ? 'editor.addParty.supplier'
+                        : 'editor.addParty.client',
+                    )}
+                  </Text>
+                </>
+              )}
             </Touchable>
-            {totals.chargesTotal ? (
-              <TotalRow
-                label={t('totals.charges')}
-                value={f.money(totals.chargesTotal, draft.currency)}
-              />
-            ) : null}
-            {totals.taxes
-              .filter(x => x.kind !== 'WITHHOLDING')
-              .map(x => (
-                <TotalRow
-                  key={`${x.id}${x.rate}`}
-                  label={`${x.name} ${rateToPercent(x.rate)}%`}
-                  value={f.money(x.amount, draft.currency)}
-                />
-              ))}
-            {draft.pricesIncludeTax && totals.taxTotal ? (
-              <Text variant="caption" tone="tertiary" style={styles.included}>
-                {t('totals.taxIncluded')}
-              </Text>
-            ) : null}
-            {totals.withholdingTotal ? (
+
+            {/* Dates */}
+            <Surface style={styles.card}>
+              {isStatement ? (
+                <>
+                  {dateRow(
+                    'statementFrom',
+                    dateLabels.statementFrom,
+                    draft.statementFrom,
+                  )}
+                  <Divider inset={52} />
+                  {dateRow(
+                    'statementTo',
+                    dateLabels.statementTo,
+                    draft.statementTo,
+                  )}
+                </>
+              ) : (
+                <>
+                  {dateRow('issueDate', dateLabels.issueDate, draft.issueDate)}
+                  {type === 'INVOICE' ? (
+                    <>
+                      <Divider inset={52} />
+                      {dateRow(
+                        'dueDate',
+                        dateLabels.dueDate,
+                        draft.dueDate,
+                        draft.termsDays === 0
+                          ? t('terms.onReceipt')
+                          : draft.termsDays
+                          ? t('terms.netDays', { count: draft.termsDays })
+                          : undefined,
+                      )}
+                    </>
+                  ) : null}
+                  {type === 'ESTIMATE' || type === 'CHANGE_ORDER' ? (
+                    <>
+                      <Divider inset={52} />
+                      {dateRow(
+                        'validUntil',
+                        dateLabels.validUntil,
+                        draft.validUntil,
+                      )}
+                    </>
+                  ) : null}
+                  {showSupplyDate &&
+                  (type === 'INVOICE' ||
+                    type === 'RECEIPT' ||
+                    type === 'DELIVERY_NOTE') ? (
+                    <>
+                      <Divider inset={52} />
+                      {dateRow(
+                        'supplyDate',
+                        dateLabels.supplyDate,
+                        draft.supplyDate,
+                      )}
+                    </>
+                  ) : null}
+                </>
+              )}
+            </Surface>
+
+            {/* Lines */}
+            {isStatement ? (
+              <View style={styles.banner}>
+                <Text variant="callout" tone="secondary">
+                  {t('editor.statementNote')}
+                </Text>
+              </View>
+            ) : (
               <>
+                <SectionHeader title={t('editor.items')} />
+                <Surface style={styles.card}>
+                  {draft.lines.map((line, index) => {
+                    const res = totals?.lines[index];
+                    const sub = lineSummary(
+                      t,
+                      f.money,
+                      f.locale,
+                      line,
+                      draft.currency,
+                      {
+                        prices: priced,
+                      },
+                    );
+                    return (
+                      <View key={line.id ?? index}>
+                        {index > 0 ? <Divider inset={16} /> : null}
+                        <SwipeRow
+                          right={{
+                            label: t('actions.delete'),
+                            icon: Trash2,
+                            tone: 'danger',
+                            onTrigger: () => removeLine(index),
+                          }}
+                        >
+                          <ListRow
+                            testID={`line-row-${index}`}
+                            title={line.name}
+                            subtitle={sub}
+                            value={
+                              priced && res
+                                ? f.money(
+                                    draft.pricesIncludeTax
+                                      ? res.taxable
+                                      : res.net,
+                                    draft.currency,
+                                  )
+                                : undefined
+                            }
+                            meta={
+                              line.kind === 'CHARGE'
+                                ? t('editor.charge')
+                                : line.discount
+                                ? t('editor.discounted')
+                                : undefined
+                            }
+                            onPress={() => openLine(index)}
+                          />
+                        </SwipeRow>
+                      </View>
+                    );
+                  })}
+                  {draft.lines.length > 0 ? <Divider /> : null}
+                  <ListRow
+                    testID="add-line"
+                    leading={
+                      <View style={styles.plus}>
+                        <Icon
+                          icon={Plus}
+                          size={16}
+                          tone="accent"
+                          strokeWidth={2}
+                        />
+                      </View>
+                    }
+                    title={t('editor.addItem')}
+                    onPress={() => openLine(null)}
+                  />
+                  {priced ? (
+                    <>
+                      <Divider inset={52} />
+                      <ListRow
+                        leadingIcon={Truck}
+                        title={t('editor.addCharge')}
+                        subtitle={t('editor.addChargeHint')}
+                        onPress={() => {
+                          setEditingLine(prev => ({
+                            nonce: prev.nonce + 1,
+                            index: null,
+                            line: {
+                              name: t('editor.shipping'),
+                              quantity: 1000,
+                              unitPrice: 0,
+                              taxes: defaultTaxes,
+                              kind: 'CHARGE',
+                            },
+                          }));
+                          lineSheet.current?.present();
+                        }}
+                      />
+                    </>
+                  ) : null}
+                </Surface>
+              </>
+            )}
+
+            {/* Totals */}
+            {priced && totals && !isStatement ? (
+              <Surface style={[styles.card, styles.totals]}>
                 <TotalRow
-                  label={t('totals.totalBeforeWithholding')}
-                  value={f.money(totals.totalBeforeWithholding, draft.currency)}
+                  label={t('totals.subtotal')}
+                  value={f.money(totals.subtotal, draft.currency)}
                 />
+                <Touchable
+                  feedback="highlight"
+                  onPress={() => discountSheet.current?.present()}
+                  style={styles.totalTouch}
+                  accessibilityRole="button"
+                >
+                  <TotalRow
+                    label={
+                      draft.discount?.type === 'PERCENT'
+                        ? `${t('document.discount')} ${rateToPercent(
+                            draft.discount.rate,
+                          )}%`
+                        : t('document.discount')
+                    }
+                    value={
+                      totals.documentDiscount
+                        ? `−${f.money(totals.documentDiscount, draft.currency)}`
+                        : t('editor.addDiscount')
+                    }
+                    accent={!totals.documentDiscount}
+                  />
+                </Touchable>
+                {totals.chargesTotal ? (
+                  <TotalRow
+                    label={t('totals.charges')}
+                    value={f.money(totals.chargesTotal, draft.currency)}
+                  />
+                ) : null}
                 {totals.taxes
-                  .filter(x => x.kind === 'WITHHOLDING')
+                  .filter(x => x.kind !== 'WITHHOLDING')
                   .map(x => (
                     <TotalRow
                       key={`${x.id}${x.rate}`}
                       label={`${x.name} ${rateToPercent(x.rate)}%`}
-                      value={`−${f.money(x.amount, draft.currency)}`}
+                      value={f.money(x.amount, draft.currency)}
                     />
                   ))}
-              </>
-            ) : null}
-            <Divider />
-            <TotalRow
-              label={t('totals.total')}
-              value={f.money(totals.total, draft.currency)}
-              strong
-            />
-            {totals.paid ? (
-              <>
+                {draft.pricesIncludeTax && totals.taxTotal ? (
+                  <Text
+                    variant="caption"
+                    tone="tertiary"
+                    style={styles.included}
+                  >
+                    {t('totals.taxIncluded')}
+                  </Text>
+                ) : null}
+                {totals.withholdingTotal ? (
+                  <>
+                    <TotalRow
+                      label={t('totals.totalBeforeWithholding')}
+                      value={f.money(
+                        totals.totalBeforeWithholding,
+                        draft.currency,
+                      )}
+                    />
+                    {totals.taxes
+                      .filter(x => x.kind === 'WITHHOLDING')
+                      .map(x => (
+                        <TotalRow
+                          key={`${x.id}${x.rate}`}
+                          label={`${x.name} ${rateToPercent(x.rate)}%`}
+                          value={`−${f.money(x.amount, draft.currency)}`}
+                        />
+                      ))}
+                  </>
+                ) : null}
+                <Divider />
                 <TotalRow
-                  label={t('totals.paid')}
-                  value={`−${f.money(totals.paid, draft.currency)}`}
-                />
-                <TotalRow
-                  label={t('totals.balanceDue')}
-                  value={f.money(totals.balanceDue, draft.currency)}
+                  label={t('totals.total')}
+                  value={f.money(totals.total, draft.currency)}
                   strong
                 />
+                {totals.paid ? (
+                  <>
+                    <TotalRow
+                      label={t('totals.paid')}
+                      value={`−${f.money(totals.paid, draft.currency)}`}
+                    />
+                    <TotalRow
+                      label={t('totals.balanceDue')}
+                      value={f.money(totals.balanceDue, draft.currency)}
+                      strong
+                    />
+                  </>
+                ) : null}
+              </Surface>
+            ) : null}
+
+            {!isStatement ? (
+              <>
+                <SectionHeader title={t('photos.title')} />
+                <PhotoStrip documentId={id} />
               </>
             ) : null}
-          </Surface>
-        ) : null}
 
-        {!isStatement ? (
-          <>
-            <SectionHeader title={t('photos.title')} />
-            <PhotoStrip documentId={id} />
-          </>
-        ) : null}
-
-        {/* Options */}
-        <SectionHeader title={t('editor.details')} />
-        <Surface style={styles.card}>
-          {priced ? (
-            <>
-              <ListRow
-                leadingIcon={Percent}
-                title={t('editor.pricesIncludeTax')}
-                onPress={() =>
-                  update({ pricesIncludeTax: !draft.pricesIncludeTax })
-                }
-                trailing={
-                  <Switch
-                    value={draft.pricesIncludeTax}
-                    onValueChange={v => update({ pricesIncludeTax: v })}
-                    accessibilityLabel={t('editor.pricesIncludeTax')}
+            {/* Options */}
+            <SectionHeader title={t('editor.details')} />
+            <Surface style={styles.card}>
+              {priced ? (
+                <>
+                  <ListRow
+                    leadingIcon={Percent}
+                    title={t('editor.pricesIncludeTax')}
+                    onPress={() =>
+                      update({ pricesIncludeTax: !draft.pricesIncludeTax })
+                    }
+                    trailing={
+                      <Switch
+                        value={draft.pricesIncludeTax}
+                        onValueChange={v => update({ pricesIncludeTax: v })}
+                        accessibilityLabel={t('editor.pricesIncludeTax')}
+                      />
+                    }
                   />
-                }
+                  <Divider inset={52} />
+                  <ListRow
+                    leadingIcon={Coins}
+                    title={t('editor.currency')}
+                    value={draft.currency}
+                    showChevron
+                    onPress={() => currencySheet.current?.present()}
+                  />
+                  <Divider inset={52} />
+                </>
+              ) : null}
+              <ListRow
+                leadingIcon={Hash}
+                title={t('document.reference')}
+                subtitle={draft.reference ?? t('document.referenceHint')}
+                onPress={() => openText('reference')}
               />
               <Divider inset={52} />
               <ListRow
-                leadingIcon={Coins}
-                title={t('editor.currency')}
-                value={draft.currency}
-                showChevron
-                onPress={() => currencySheet.current?.present()}
+                leadingIcon={StickyNote}
+                title={t('document.notes')}
+                subtitle={draft.notes ?? t('editor.notSet')}
+                onPress={() => openText('notes')}
               />
               <Divider inset={52} />
-            </>
-          ) : null}
-          <ListRow
-            leadingIcon={Hash}
-            title={t('document.reference')}
-            subtitle={draft.reference ?? t('document.referenceHint')}
-            onPress={() => openText('reference')}
-          />
-          <Divider inset={52} />
-          <ListRow
-            leadingIcon={StickyNote}
-            title={t('document.notes')}
-            subtitle={draft.notes ?? t('editor.notSet')}
-            onPress={() => openText('notes')}
-          />
-          <Divider inset={52} />
-          <ListRow
-            leadingIcon={ScrollText}
-            title={t('document.terms')}
-            subtitle={draft.terms ?? t('editor.notSet')}
-            onPress={() => openText('terms')}
-          />
-        </Surface>
-      </Animated.ScrollView>
+              <ListRow
+                leadingIcon={ScrollText}
+                title={t('document.terms')}
+                subtitle={draft.terms ?? t('editor.notSet')}
+                onPress={() => openText('terms')}
+              />
+            </Surface>
+          </Animated.ScrollView>
 
-      {/* Footer */}
-      <View style={[styles.footer, { paddingBottom: insets.bottom + 12 }]}>
-        {isIssued ? (
-          <Button
-            testID="editor-save-issued"
-            variant="primary"
-            size="lg"
-            fullWidth
-            label={dirty ? t('editor.saveChanges') : t('common.done')}
-            onPress={dirty ? saveIssued : () => navigation.goBack()}
-          />
-        ) : (
-          <>
-            {numberPreview ? (
-              <View style={styles.numberHint}>
-                <Icon icon={FileText} size={14} tone="tertiary" />
-                <Text variant="caption" tone="tertiary" tabular>
-                  {t('editor.willBeNumbered', { number: numberPreview })}
-                </Text>
-                <Touchable
-                  testID="editor-numbering"
-                  feedback="highlight"
-                  hitSlop={10}
-                  style={styles.change}
-                  onPress={() => numberingSheet.current?.present()}
-                  accessibilityRole="button"
-                  accessibilityLabel={t('numbering.title')}
-                >
-                  <Text variant="captionMedium" tone="accent">
-                    {t('numbering.change')}
-                  </Text>
-                </Touchable>
-              </View>
-            ) : null}
-            <View style={styles.footerRow}>
-              <View style={styles.previewButton}>
-                <Button
-                  testID="editor-preview-button"
-                  variant="secondary"
-                  size="lg"
-                  fullWidth
-                  leadingIcon={Eye}
-                  label={t('preview.short')}
-                  onPress={preview}
-                />
-              </View>
-              <View style={styles.flex}>
-                <Button
-                  testID="editor-issue"
-                  variant="primary"
-                  size="lg"
-                  fullWidth
-                  leadingIcon={Send}
-                  label={t('share.send')}
-                  onPress={send}
-                />
-              </View>
-            </View>
-          </>
-        )}
+          {/* Footer */}
+          <View style={[styles.footer, { paddingBottom: insets.bottom + 12 }]}>
+            {isIssued ? (
+              <Button
+                testID="editor-save-issued"
+                variant="primary"
+                size="lg"
+                fullWidth
+                label={dirty ? t('editor.saveChanges') : t('common.done')}
+                onPress={dirty ? saveIssued : () => navigation.goBack()}
+              />
+            ) : (
+              <>
+                {numberPreview ? (
+                  <View style={styles.numberHint}>
+                    <Icon icon={FileText} size={14} tone="tertiary" />
+                    <Text variant="caption" tone="tertiary" tabular>
+                      {t('editor.willBeNumbered', { number: numberPreview })}
+                    </Text>
+                    <Touchable
+                      testID="editor-numbering"
+                      feedback="highlight"
+                      hitSlop={10}
+                      style={styles.change}
+                      onPress={() => numberingSheet.current?.present()}
+                      accessibilityRole="button"
+                      accessibilityLabel={t('numbering.title')}
+                    >
+                      <Text variant="captionMedium" tone="accent">
+                        {t('numbering.change')}
+                      </Text>
+                    </Touchable>
+                  </View>
+                ) : null}
+                <View style={styles.footerRow}>
+                  {wide ? null : (
+                    <View style={styles.previewButton}>
+                      <Button
+                        testID="editor-preview-button"
+                        variant="secondary"
+                        size="lg"
+                        fullWidth
+                        leadingIcon={Eye}
+                        label={t('preview.short')}
+                        onPress={preview}
+                      />
+                    </View>
+                  )}
+                  <View style={styles.flex}>
+                    <Button
+                      testID="editor-issue"
+                      variant="primary"
+                      size="lg"
+                      fullWidth
+                      leadingIcon={Send}
+                      label={t('share.send')}
+                      onPress={send}
+                    />
+                  </View>
+                </View>
+              </>
+            )}
+          </View>
+        </View>
+        {wide ? (
+          <View style={styles.previewPane}>
+            <EditorPreview id={id} />
+          </View>
+        ) : null}
       </View>
 
       <NumberingSheet
@@ -1093,6 +1127,16 @@ const styles = StyleSheet.create(theme => ({
     justifyContent: 'center',
     gap: theme.space[1.5],
   },
+  split: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  previewPane: {
+    width: '46%',
+    backgroundColor: theme.colors.bg.subtle,
+    borderLeftWidth: StyleSheet.hairlineWidth,
+    borderLeftColor: theme.colors.border.subtle,
+  },
   footer: {
     gap: theme.space[2],
     paddingHorizontal: theme.size.gutter,
@@ -1102,3 +1146,20 @@ const styles = StyleSheet.create(theme => ({
     backgroundColor: theme.colors.bg.app,
   },
 }));
+
+function EditorPreview({ id }: { id: string }) {
+  const { t } = useTranslation();
+  const { width } = useWindowDimensions();
+  const preview = usePdfPreview(
+    id,
+    {},
+    Math.min(1600, Math.round(width * 0.46 * PixelRatio.get())),
+  );
+  return (
+    <PdfPages
+      pages={preview.pages}
+      paper={preview.model?.paper ?? 'A4'}
+      pageLabel={(n, total) => t('preview.page', { n, total })}
+    />
+  );
+}

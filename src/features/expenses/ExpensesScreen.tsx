@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StyleSheet } from 'react-native-unistyles';
 
 import type { DrawerProps } from '@/app/navigation';
+import { useProGate } from '@/billing/useProGate';
 import { clock, mutate, useLiveQuery } from '@/data/live';
 import {
   deleteExpense,
@@ -43,6 +44,7 @@ export function ExpensesScreen({ navigation }: DrawerProps<'Expenses'>) {
   const today = clock.today();
   const { data: expenses } = useLiveQuery(db => listExpenses(db), []);
   const root = navigation.getParent();
+  const { gate } = useProGate();
 
   const { sections, month, year } = useMemo(() => {
     const byMonth = new Map<string, Expense[]>();
@@ -191,7 +193,7 @@ export function ExpensesScreen({ navigation }: DrawerProps<'Expenses'>) {
       <NewButton
         testID="new-expense"
         label={t('expenses.new')}
-        onPress={() => root?.navigate('ExpenseEditor')}
+        onPress={() => gate('expenses') && root?.navigate('ExpenseEditor')}
       />
     </View>
   );

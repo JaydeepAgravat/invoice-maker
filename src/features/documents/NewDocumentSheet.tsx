@@ -14,6 +14,8 @@ import {
   type SheetRef,
 } from '@/ui/primitives';
 
+import { useProGate } from '@/billing/useProGate';
+
 import { DOC_TYPES, type DocType } from './docTypes';
 
 type Props = {
@@ -27,9 +29,13 @@ type Props = {
  */
 export function NewDocumentSheet({ ref, onSelect }: Props) {
   const { t } = useTranslation();
+  const { isPro, gate } = useProGate();
 
-  const pick = (type: DocType) => {
+  const pick = (type: DocType, pro = false) => {
     ref.current?.dismiss();
+    if (pro && !gate('docTypes')) {
+      return;
+    }
     onSelect(type);
   };
 
@@ -63,9 +69,11 @@ export function NewDocumentSheet({ ref, onSelect }: Props) {
           title={t(d.labelKey)}
           leadingIcon={d.icon}
           trailing={
-            d.pro ? <Badge label="Pro" tone="accent" dot={false} /> : undefined
+            d.pro && !isPro ? (
+              <Badge label="Pro" tone="accent" dot={false} />
+            ) : undefined
           }
-          onPress={() => pick(d.type)}
+          onPress={() => pick(d.type, d.pro)}
           accessibilityLabel={d.pro ? `${t(d.labelKey)}, Pro` : t(d.labelKey)}
         />
       ))}

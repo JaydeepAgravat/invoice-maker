@@ -7,12 +7,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StyleSheet } from 'react-native-unistyles';
 
 import type { RootScreenProps } from '@/app/navigation';
-import { useIsPro } from '@/billing/entitlement';
+import { useProGate } from '@/billing/useProGate';
 import { clock, mutate, useLiveQuery } from '@/data/live';
 import { useProfile } from '@/data/ProfileProvider';
 import { getDocument, setAppearance } from '@/data/repositories/documents';
 import { updateProfile } from '@/data/repositories/profile';
-import { isTemplateId } from '@/pdf/model';
+import { isTemplateId, PRO_TEMPLATES } from '@/pdf/model';
 import { ScreenHeader } from '@/ui/layout/ScreenHeader';
 import { Button, IconButton, Text, Touchable } from '@/ui/primitives';
 import { toast } from '@/ui/toast/store';
@@ -37,7 +37,7 @@ export function PreviewScreen({
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const { profile } = useProfile();
-  const pro = useIsPro();
+  const { isPro: pro, gate } = useProGate();
   const share = useRef<ShareSheetRef>(null);
 
   const { data: doc } = useLiveQuery(db => getDocument(db, id), [id]);
@@ -63,6 +63,12 @@ export function PreviewScreen({
   );
 
   const change = async (patch: Partial<AppearanceValue>) => {
+    if (patch.template && PRO_TEMPLATES.includes(patch.template) && !gate('templates')) {
+      return;
+    }
+    if (patch.accent && patch.accent !== ACCENTS[0] && !gate('colors')) {
+      return;
+    }
     setLocal(l => ({ ...l, ...patch }));
     await mutate(tx =>
       setAppearance(tx, clock, id, {

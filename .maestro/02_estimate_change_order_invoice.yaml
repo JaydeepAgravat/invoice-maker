@@ -40,6 +40,17 @@ name: 02_estimate_change_order_invoice
     id: "detail-more"
 - tapOn:
     id: "action-CREATE_CHANGE_ORDER"
+# Change orders are Pro: the paywall explains, unlocking (test mode) continues.
+- assertVisible: "Unlock everything, once"
+- tapOn:
+    id: "paywall-buy"
+- extendedWaitUntil:
+    visible: "Pro unlocked.*"
+    timeout: 10000
+- tapOn:
+    id: "detail-more"
+- tapOn:
+    id: "action-CREATE_CHANGE_ORDER"
 - tapOn:
     id: "add-line"
 - tapOn:

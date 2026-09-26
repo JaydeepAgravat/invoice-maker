@@ -63,6 +63,8 @@ const de: Messages = {
         body: 'Rechnungen landen hier, sobald sie vollständig bezahlt sind.',
       },
     },
+    selectTitle: 'Dokument auswählen',
+    selectBody: 'Es öffnet sich hier, neben der Liste.',
   },
   new: {
     button: 'Neu',
@@ -847,7 +849,76 @@ const de: Messages = {
     stopped: 'Diese Rechnung wird nicht mehr wiederholt',
     saved: 'Nächste Rechnung am {{date}}',
   },
+  paywall: {
+    title: 'Alles freischalten, einmalig',
+    subtitle: 'Einmal zahlen, für immer behalten. Kein Abo.',
+    sendsReached: 'Sie haben diesen Monat {{count}} Dokumente gesendet. Kostenlos sind {{count}} pro Monat enthalten.',
+    buy: 'Für {{price}} freischalten',
+    buying: 'Google Play wird geöffnet…',
+    once: 'Eine Zahlung über Google Play. Kein Abo.',
+    restore: 'Kauf wiederherstellen',
+    dataPromise: 'Alles, was Sie erstellen, bleibt Ihres, mit oder ohne Pro.',
+    thanks: 'Pro freigeschaltet. Vielen Dank.',
+    restored: 'Pro wiederhergestellt',
+    nothingToRestore: 'Kein Kauf in diesem Google-Konto gefunden',
+    unavailable: 'Käufe sind noch nicht verfügbar. Bitte später erneut versuchen.',
+    failed: 'Der Kauf wurde nicht abgeschlossen. Es wurde nichts berechnet.',
+    see: 'Pro ansehen',
+    reportsTitle: 'Wissen, wie Ihr Geschäft läuft',
+    reportsBody: 'Gewinn, Einnahmen nach Monat und Kunde, vereinnahmte Umsatzsteuer und offene Posten, mit PDF- und Tabellenexport.',
+    rows: {
+      sends: {
+        title: 'Unbegrenzt senden',
+        body: 'Kostenlos sind {{count}} Dokumente pro Monat enthalten',
+      },
+      look: {
+        title: 'Alle Vorlagen und Farben',
+        body: 'Vorlagen Modern und Kräftig, Ihre Markenfarbe',
+      },
+      photos: {
+        title: 'Fotos und Kundenunterschrift',
+        body: 'Fotos vom Auftrag, Unterschrift auf dem Telefon',
+      },
+      reports: {
+        title: 'Berichte und Exporte',
+        body: 'Gewinn, Umsatzsteuer, offene Posten, CSV und PDF',
+      },
+      money: {
+        title: 'Ausgaben und Fahrten',
+        body: 'Belege und Fahrten bereit für die Steuer',
+      },
+      docs: {
+        title: 'Nachträge, Bestellungen, Kontoauszüge',
+        body: 'Für größere Aufträge und Stammkunden',
+      },
+      backup: {
+        title: 'Automatische Drive-Sicherung',
+        body: 'Jede Woche, ohne daran zu denken',
+      },
+      footer: {
+        title: 'Ohne „Erstellt mit“',
+        body: 'Ihre Dokumente tragen nur Ihre Marke',
+      },
+    },
+  },
+  lock: {
+    title: '{{app}} entsperren',
+    subtitle: 'Mit Fingerabdruck, Gesicht oder Displaysperre',
+    locked: '{{app}} ist gesperrt',
+    unlock: 'Entsperren',
+    setting: 'App-Sperre',
+    settingHint: 'Beim Öffnen nach Fingerabdruck, Gesicht oder Displaysperre fragen',
+    noScreenLock: 'Richten Sie zuerst eine Displaysperre in den Telefoneinstellungen ein.',
+  },
+  widget: {
+    overdue: '{{amount}} überfällig',
+    nothingOverdue: 'Nichts überfällig',
+  },
   settings: {
+    homeScreen: 'Startbildschirm',
+    addWidget: 'Widget hinzufügen',
+    addWidgetHint: 'Offene Beträge und schnell eine neue Rechnung',
+    widgetManual: 'Startbildschirm lange drücken, Widgets tippen und diese App suchen.',
     appearance: 'Darstellung',
     theme: 'Design',
     themeSystem: 'System',
@@ -862,6 +933,7 @@ const de: Messages = {
     business: 'Unternehmen',
     devPro: 'Pro-Funktionen (Test)',
     data: 'Daten',
+    security: 'Sicherheit',
   },
 };
 

@@ -12,11 +12,14 @@ import { SystemBars } from 'react-native-edge-to-edge';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
+import { initBilling } from '@/billing/store';
 import { DatabaseGate } from '@/data/DatabaseGate';
 import { ProfileProvider } from '@/data/ProfileProvider';
+import { AppLock } from '@/features/lock/AppLock';
 import { ToastHost } from '@/ui/toast/ToastHost';
 
 import type { RootStackParamList } from './navigation';
+import { navigationRef } from './navigationRef';
 import { RootNavigator } from './RootNavigator';
 
 /** Links from reminder notifications. */
@@ -29,6 +32,8 @@ const linking: LinkingOptions<RootStackParamList> = {
     },
   },
 };
+
+initBilling();
 
 export function App() {
   const { theme } = useUnistyles();
@@ -54,7 +59,7 @@ export function App() {
     <GestureHandlerRootView style={styles.root}>
       <SafeAreaProvider>
         <SystemBars style={theme.dark ? 'light' : 'dark'} />
-        <NavigationContainer theme={navigationTheme} linking={linking}>
+        <NavigationContainer ref={navigationRef} theme={navigationTheme} linking={linking}>
           <BottomSheetModalProvider>
             <DatabaseGate>
               <ProfileProvider>
@@ -62,6 +67,7 @@ export function App() {
               </ProfileProvider>
             </DatabaseGate>
             <ToastHost />
+            <AppLock />
           </BottomSheetModalProvider>
         </NavigationContainer>
       </SafeAreaProvider>

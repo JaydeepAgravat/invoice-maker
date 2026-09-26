@@ -61,6 +61,8 @@ const en = {
         body: 'Invoices move here once they’re paid in full.',
       },
     },
+    selectTitle: 'Choose a document',
+    selectBody: 'It opens here, next to the list.',
   },
   new: {
     button: 'New',
@@ -843,7 +845,76 @@ const en = {
     stopped: 'This invoice no longer repeats',
     saved: 'Next invoice on {{date}}',
   },
+  paywall: {
+    title: 'Unlock everything, once',
+    subtitle: 'Pay once and keep it. No subscription.',
+    sendsReached: 'You’ve sent {{count}} documents this month. The free plan includes {{count}} a month.',
+    buy: 'Unlock for {{price}}',
+    buying: 'Opening Google Play…',
+    once: 'One payment through Google Play. No subscription.',
+    restore: 'Restore purchase',
+    dataPromise: 'Everything you create stays yours, with or without Pro.',
+    thanks: 'Pro unlocked. Thank you.',
+    restored: 'Pro restored',
+    nothingToRestore: 'No purchase found on this Google account',
+    unavailable: 'Purchases aren’t available yet. Please try again later.',
+    failed: 'The purchase didn’t go through. You haven’t been charged.',
+    see: 'See what’s in Pro',
+    reportsTitle: 'Know how your business is doing',
+    reportsBody: 'Profit, income by month and client, tax collected and who owes you, with PDF and spreadsheet exports.',
+    rows: {
+      sends: {
+        title: 'Unlimited sending',
+        body: 'Free includes {{count}} documents a month',
+      },
+      look: {
+        title: 'Every template and colour',
+        body: 'Modern and Bold templates, your brand colour',
+      },
+      photos: {
+        title: 'Photos and client signatures',
+        body: 'Job photos on documents, sign on your phone',
+      },
+      reports: {
+        title: 'Reports and exports',
+        body: 'Profit, tax collected, what’s owed, CSV and PDF',
+      },
+      money: {
+        title: 'Expenses and mileage',
+        body: 'Receipts and trips, ready for tax time',
+      },
+      docs: {
+        title: 'Change orders, POs and statements',
+        body: 'For bigger jobs and regular clients',
+      },
+      backup: {
+        title: 'Automatic Drive backup',
+        body: 'Weekly, without thinking about it',
+      },
+      footer: {
+        title: 'No “Made with” footer',
+        body: 'Documents carry only your brand',
+      },
+    },
+  },
+  lock: {
+    title: 'Unlock {{app}}',
+    subtitle: 'Use your fingerprint, face or screen lock',
+    locked: '{{app}} is locked',
+    unlock: 'Unlock',
+    setting: 'App lock',
+    settingHint: 'Ask for your fingerprint, face or screen lock when opening the app',
+    noScreenLock: 'Set up a screen lock in your phone settings first.',
+  },
+  widget: {
+    overdue: '{{amount}} overdue',
+    nothingOverdue: 'Nothing overdue',
+  },
   settings: {
+    homeScreen: 'Home screen',
+    addWidget: 'Add widget',
+    addWidgetHint: 'What’s owed and a quick “New invoice”',
+    widgetManual: 'Long-press your home screen, tap Widgets and find this app.',
     appearance: 'Appearance',
     theme: 'Theme',
     themeSystem: 'System',
@@ -858,6 +929,7 @@ const en = {
     business: 'Business',
     devPro: 'Pro features (testing)',
     data: 'Data',
+    security: 'Security',
   },
 };
 

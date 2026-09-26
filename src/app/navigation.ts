@@ -34,6 +34,7 @@ export type RootStackParamList = {
   CommandPalette: undefined;
   BusinessProfile: undefined;
   Backup: undefined;
+  Paywall: { feature?: import('@/billing/useProGate').ProFeature } | undefined;
   Import: { target: 'clients' | 'items' };
   ExpenseEditor: { id?: string } | undefined;
   TripEditor: { id?: string } | undefined;

@@ -7,7 +7,7 @@ name: 05_expenses_mileage_reports_signature
     visible: "Documents"
     timeout: 20000
 
-# Expense: £40.00 fuel.
+# Expense: £40.00 fuel (Pro was unlocked in flow 02).
 - tapOn: "Open menu"
 - tapOn: "Expenses"
 - tapOn:

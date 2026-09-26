@@ -16,6 +16,8 @@ type Props = {
   doc: DocumentSummary;
   today: string;
   onPress: (id: string) => void;
+  /** Highlighted when open in the side pane (tablets). */
+  selected?: boolean;
 };
 
 /**
@@ -26,6 +28,7 @@ export const DocumentRow = memo(function DocumentRowView({
   doc,
   today,
   onPress,
+  selected = false,
 }: Props) {
   const { t } = useTranslation();
   const f = useFormat();
@@ -64,7 +67,7 @@ export const DocumentRow = memo(function DocumentRowView({
         amount,
         doc.currency,
       )}, ${status}`}
-      style={styles.row}
+      style={[styles.row, selected && styles.selected]}
     >
       <Avatar name={who} size={36} />
       <View style={styles.main}>
@@ -100,6 +103,9 @@ export const DocumentRow = memo(function DocumentRowView({
 });
 
 const styles = StyleSheet.create(theme => ({
+  selected: {
+    backgroundColor: theme.colors.bg.selected,
+  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',

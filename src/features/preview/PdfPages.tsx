@@ -31,7 +31,10 @@ export function PdfPages({
   bottomInset?: number;
 }) {
   const { theme } = useUnistyles();
-  const { width } = useWindowDimensions();
+  const window = useWindowDimensions();
+  // Measure the container: this may be a side pane, not the whole window.
+  const [measured, setMeasured] = useState<number | null>(null);
+  const width = measured ?? window.width;
   const [zoom, setZoom] = useState(1);
   const pinch = useSharedValue(1);
 
@@ -102,6 +105,7 @@ export function PdfPages({
     <GestureDetector gesture={gesture}>
       <ScrollView
         style={styles.flex}
+        onLayout={e => setMeasured(e.nativeEvent.layout.width)}
         contentContainerStyle={[
           styles.scroll,
           { paddingBottom: bottomInset + theme.space[6] },

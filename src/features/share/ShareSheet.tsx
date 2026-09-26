@@ -14,12 +14,17 @@ import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, View } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
+import { useNavigation } from '@react-navigation/native';
+
+import { isPro } from '@/billing/entitlement';
+import { FREE_SENDS_PER_MONTH } from '@/config';
 import { clock, mutate } from '@/data/live';
 import { getDatabase } from '@/data/database';
 import { getClient } from '@/data/repositories/clients';
 import {
   getDocument,
   issueDocument,
+  documentsSharedInMonth,
   recordShare,
   type DocumentRecord,
 } from '@/data/repositories/documents';
@@ -80,6 +85,7 @@ export function ShareSheet({
   const { t } = useTranslation();
   const { theme } = useUnistyles();
   const sheet = useRef<SheetRef>(null);
+  const navigation = useNavigation();
   const [ctx, setCtx] = useState<Context | null>(null);
   const [body, setBody] = useState('');
   const [busy, setBusy] = useState<Channel | 'mark' | null>(null);
@@ -149,6 +155,17 @@ export function ShareSheet({
   const send = async (channel: Channel) => {
     if (!ctx || busy) {
       return;
+    }
+    // Free plan: five documents a month. Re-sharing one already sent is free.
+    if (!isPro()) {
+      const db = await getDatabase();
+      const shared = await db.execute('SELECT 1 FROM share_log WHERE document_id = ? LIMIT 1', [ctx.id]);
+      const used = await documentsSharedInMonth(db, clock.today().slice(0, 7));
+      if (!shared.rows.length && used >= FREE_SENDS_PER_MONTH) {
+        sheet.current?.dismiss();
+        navigation.navigate('Paywall', { feature: 'sends' });
+        return;
+      }
     }
     setBusy(channel);
     try {

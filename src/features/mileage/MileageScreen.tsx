@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StyleSheet } from 'react-native-unistyles';
 
 import type { DrawerProps } from '@/app/navigation';
+import { useProGate } from '@/billing/useProGate';
 import { clock, mutate, useLiveQuery } from '@/data/live';
 import {
   deleteTrip,
@@ -55,6 +56,7 @@ export function MileageScreen({ navigation }: DrawerProps<'Mileage'>) {
   const year = clock.today().slice(0, 4);
   const { data: trips } = useLiveQuery(db => listTrips(db), []);
   const root = navigation.getParent();
+  const { gate } = useProGate();
 
   const totals = useMemo(() => {
     const thisYear = (trips ?? []).filter(
@@ -166,7 +168,7 @@ export function MileageScreen({ navigation }: DrawerProps<'Mileage'>) {
       <NewButton
         testID="new-trip"
         label={t('mileage.new')}
-        onPress={() => root?.navigate('TripEditor')}
+        onPress={() => gate('mileage') && root?.navigate('TripEditor')}
       />
     </View>
   );

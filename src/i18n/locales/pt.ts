@@ -63,6 +63,8 @@ const pt: Messages = {
         body: 'As faturas vêm para cá quando são pagas por completo.',
       },
     },
+    selectTitle: 'Escolha um documento',
+    selectBody: 'Ele abre aqui, ao lado da lista.',
   },
   new: {
     button: 'Novo',
@@ -846,7 +848,76 @@ const pt: Messages = {
     stopped: 'Esta fatura não se repete mais',
     saved: 'Próxima fatura em {{date}}',
   },
+  paywall: {
+    title: 'Libere tudo, uma vez',
+    subtitle: 'Pague uma vez e é seu. Sem assinatura.',
+    sendsReached: 'Você enviou {{count}} documentos este mês. O plano grátis inclui {{count}} por mês.',
+    buy: 'Liberar por {{price}}',
+    buying: 'Abrindo o Google Play…',
+    once: 'Um único pagamento pelo Google Play. Sem assinatura.',
+    restore: 'Restaurar compra',
+    dataPromise: 'Tudo o que você cria continua seu, com ou sem Pro.',
+    thanks: 'Pro liberado. Obrigado.',
+    restored: 'Pro restaurado',
+    nothingToRestore: 'Nenhuma compra nesta conta Google',
+    unavailable: 'As compras ainda não estão disponíveis. Tente mais tarde.',
+    failed: 'A compra não foi concluída. Você não foi cobrado.',
+    see: 'Ver o que o Pro inclui',
+    reportsTitle: 'Saiba como vai sua empresa',
+    reportsBody: 'Lucro, receitas por mês e cliente, impostos cobrados e quem deve, com exportação em PDF e planilha.',
+    rows: {
+      sends: {
+        title: 'Envios ilimitados',
+        body: 'O grátis inclui {{count}} documentos por mês',
+      },
+      look: {
+        title: 'Todos os modelos e cores',
+        body: 'Modelos Moderno e Marcante, a cor da sua marca',
+      },
+      photos: {
+        title: 'Fotos e assinatura do cliente',
+        body: 'Fotos do serviço e assinatura no celular',
+      },
+      reports: {
+        title: 'Relatórios e exportações',
+        body: 'Lucro, impostos, valores a receber, CSV e PDF',
+      },
+      money: {
+        title: 'Despesas e quilometragem',
+        body: 'Comprovantes e viagens prontos para os impostos',
+      },
+      docs: {
+        title: 'Aditivos, pedidos de compra, extratos',
+        body: 'Para serviços maiores e clientes frequentes',
+      },
+      backup: {
+        title: 'Backup automático no Drive',
+        body: 'Toda semana, sem precisar lembrar',
+      },
+      footer: {
+        title: 'Sem rodapé “Criado com”',
+        body: 'Seus documentos levam só a sua marca',
+      },
+    },
+  },
+  lock: {
+    title: 'Desbloquear {{app}}',
+    subtitle: 'Use sua digital, rosto ou bloqueio de tela',
+    locked: '{{app}} está bloqueado',
+    unlock: 'Desbloquear',
+    setting: 'Bloqueio do app',
+    settingHint: 'Pede digital, rosto ou bloqueio de tela ao abrir o app',
+    noScreenLock: 'Configure primeiro um bloqueio de tela nas configurações do telefone.',
+  },
+  widget: {
+    overdue: '{{amount}} vencido',
+    nothingOverdue: 'Nada vencido',
+  },
   settings: {
+    homeScreen: 'Tela inicial',
+    addWidget: 'Adicionar widget',
+    addWidgetHint: 'O que falta receber e um atalho para nova fatura',
+    widgetManual: 'Toque e segure a tela inicial, toque em Widgets e procure este app.',
     appearance: 'Aparência',
     theme: 'Tema',
     themeSystem: 'Sistema',
@@ -861,6 +932,7 @@ const pt: Messages = {
     business: 'Empresa',
     devPro: 'Recursos Pro (testes)',
     data: 'Dados',
+    security: 'Segurança',
   },
 };
 

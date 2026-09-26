@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="reminders_channel">Erinnerungen</string>
+    <string name="widget_label">Offen</string>
+    <string name="widget_description">Was Kunden Ihnen schulden, und schnell eine Rechnung schreiben</string>
 </resources>

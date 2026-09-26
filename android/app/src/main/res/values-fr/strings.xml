@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="reminders_channel">Rappels</string>
+    <string name="widget_label">À encaisser</string>
+    <string name="widget_description">Ce que vos clients vous doivent, et une facture en un geste</string>
 </resources>

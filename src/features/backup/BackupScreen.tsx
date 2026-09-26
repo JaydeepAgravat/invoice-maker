@@ -27,6 +27,7 @@ import {
   type OpenedBackup,
 } from '@/backup/service';
 import { BackupError } from '@/backup/snapshot';
+import { useProGate } from '@/billing/useProGate';
 import { EXPORT_KINDS, exportCsv } from '@/features/reports/exports';
 import { useFormat } from '@/lib/format';
 import { PrefKeys, prefs } from '@/lib/storage';
@@ -63,6 +64,7 @@ export function BackupScreen({ navigation }: RootScreenProps<'Backup'>) {
   const [driveFiles, setDriveFiles] = useState<DriveFile[]>([]);
   const [opened, setOpened] = useState<OpenedBackup | null>(null);
   const restoreSheet = useRef<SheetRef>(null);
+  const { gate } = useProGate();
   const driveSheet = useRef<SheetRef>(null);
   const exportSheet = useRef<SheetRef>(null);
   const driveError = prefs.getString(PrefKeys.driveError);
@@ -146,6 +148,9 @@ export function BackupScreen({ navigation }: RootScreenProps<'Backup'>) {
 
   const toggleAuto = (value: boolean) =>
     run('auto', async () => {
+      if (value && !gate('autoBackup')) {
+        return;
+      }
       if (value && !(await backupToDrive(true))) {
         return;
       }

@@ -44,6 +44,7 @@ import {
   statusOf,
   type DocumentRecord,
 } from '@/data/repositories/documents';
+import { useProGate } from '@/billing/useProGate';
 import { getClientSignature } from '@/data/repositories/attachments';
 import { getSchedule, type Schedule } from '@/data/repositories/recurring';
 import { contractValue } from '@/domain/changeOrder';
@@ -116,7 +117,12 @@ const PRIMARY_ORDER: UiAction[] = [
 export function DocumentDetailScreen({
   navigation,
   route,
-}: RootScreenProps<'DocumentDetail'>) {
+  embedded = false,
+}: Pick<RootScreenProps<'DocumentDetail'>, 'navigation'> & {
+  route: Pick<RootScreenProps<'DocumentDetail'>['route'], 'key' | 'name' | 'params'>;
+  /** Shown beside the inbox list on wide screens (no back button). */
+  embedded?: boolean;
+}) {
   const { id } = route.params;
   const { t } = useTranslation();
   const f = useFormat();
@@ -127,6 +133,7 @@ export function DocumentDetailScreen({
   const voidSheet = useRef<SheetRef>(null);
   const shareSheet = useRef<ShareSheetRef>(null);
   const recurringSheet = useRef<SheetRef>(null);
+  const { gate } = useProGate();
   const [, force] = useState(0);
 
   const { data } = useLiveQuery<Loaded | null>(
@@ -220,6 +227,9 @@ export function DocumentDetailScreen({
         return;
       }
       case 'CREATE_CHANGE_ORDER': {
+        if (!gate('docTypes')) {
+          return;
+        }
         const co = await mutate(tx => createChangeOrder(tx, clock, id));
         navigation.push('DocumentEditor', { id: co.id, isNew: true });
         return;
@@ -279,11 +289,13 @@ export function DocumentDetailScreen({
         title={doc.number ?? t(docTypeKey(doc.type))}
         scrollY={scrollY}
         left={
-          <IconButton
-            icon={ArrowLeft}
-            label={t('common.back')}
-            onPress={() => navigation.goBack()}
-          />
+          embedded ? undefined : (
+            <IconButton
+              icon={ArrowLeft}
+              label={t('common.back')}
+              onPress={() => navigation.goBack()}
+            />
+          )
         }
         right={
           <>
@@ -469,7 +481,7 @@ export function DocumentDetailScreen({
               title={t('signature.collect')}
               subtitle={t('signature.collectHint')}
               showChevron
-              onPress={() => navigation.push('Signature', { documentId: id })}
+              onPress={() => gate('signature') && navigation.push('Signature', { documentId: id })}
             />
           </Surface>
         ) : null}
@@ -729,6 +741,9 @@ const styles = StyleSheet.create(theme => ({
   },
   footer: {
     flexDirection: 'row',
+    width: '100%',
+    maxWidth: theme.size.contentMax + theme.size.gutter * 2,
+    alignSelf: 'center',
     gap: theme.space[2],
     paddingHorizontal: theme.size.gutter,
     paddingTop: theme.space[3],

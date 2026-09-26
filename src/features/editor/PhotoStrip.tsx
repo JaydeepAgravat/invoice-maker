@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Image, ScrollView } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
 
+import { useProGate } from '@/billing/useProGate';
 import { clock, mutate, useLiveQuery } from '@/data/live';
 import {
   addPhoto,
@@ -32,6 +33,7 @@ const PHOTO = { maxSize: 1600, format: 'jpeg', folder: 'photos' };
 export function PhotoStrip({ documentId }: { documentId: string }) {
   const { t } = useTranslation();
   const addSheet = useRef<SheetRef>(null);
+  const { gate } = useProGate();
   const photoSheet = useRef<SheetRef>(null);
   const [selected, setSelected] = useState<Photo | null>(null);
   const { data: photos } = useLiveQuery(
@@ -90,7 +92,7 @@ export function PhotoStrip({ documentId }: { documentId: string }) {
           testID="add-photo"
           feedback="scale"
           style={styles.add}
-          onPress={() => addSheet.current?.present()}
+          onPress={() => gate('photos') && addSheet.current?.present()}
           accessibilityRole="button"
           accessibilityLabel={t('photos.add')}
         >

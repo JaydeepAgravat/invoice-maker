@@ -55,6 +55,7 @@ import { toast } from '@/ui/toast/store';
 import { DocumentRow } from './DocumentRow';
 import { BackupNudge } from './BackupNudge';
 import { NewButton } from './NewButton';
+import { DocumentDetailScreen } from '../documents/DocumentDetailScreen';
 
 const VIEWS: readonly InboxView[] = [
   'all',
@@ -72,6 +73,9 @@ export function InboxScreen({ navigation, route }: DrawerProps<'Inbox'>) {
   const root = useNavigation();
   const { width } = useWindowDimensions();
   const permanentDrawer = width >= breakpoints.lg;
+  // Tablets and unfolded foldables: list and document side by side.
+  const twoPane = width >= TWO_PANE_MIN;
+  const [selected, setSelected] = useState<string | null>(null);
   const view = route.params?.view ?? 'all';
   const sheet = useRef<SheetRef>(null);
   const [limit, setLimit] = useState(PAGE);
@@ -94,12 +98,16 @@ export function InboxScreen({ navigation, route }: DrawerProps<'Inbox'>) {
   const open = useCallback(
     (id: string) => {
       const doc = data?.docs.find(d => d.id === id);
+      if (twoPane && doc?.status !== 'DRAFT') {
+        setSelected(id);
+        return;
+      }
       root.navigate(
         doc?.status === 'DRAFT' ? 'DocumentEditor' : 'DocumentDetail',
         { id },
       );
     },
-    [data?.docs, root],
+    [data?.docs, root, twoPane],
   );
 
   const create = async (type: DocType) => {
@@ -215,17 +223,22 @@ export function InboxScreen({ navigation, route }: DrawerProps<'Inbox'>) {
   const renderItem = useCallback(
     ({ item }: { item: DocumentSummary }) => (
       <SwipeRow left={leftAction(item)} right={rightAction(item)}>
-        <DocumentRow doc={item} today={today} onPress={open} />
+        <DocumentRow
+          doc={item}
+          today={today}
+          onPress={open}
+          selected={twoPane && item.id === selected}
+        />
       </SwipeRow>
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [open, today, t],
+    [open, today, t, selected, twoPane],
   );
 
   const isEmpty = data && data.docs.length === 0;
 
-  return (
-    <View style={styles.screen}>
+  const list = (
+    <>
       <ScreenHeader
         title={t('nav.inbox')}
         scrollY={scrollY}
@@ -385,6 +398,30 @@ export function InboxScreen({ navigation, route }: DrawerProps<'Inbox'>) {
       />
 
       <NewButton onPress={() => sheet.current?.present()} />
+    </>
+  );
+
+  return (
+    <View style={styles.screen}>
+      {twoPane ? (
+        <View style={styles.panes}>
+          <View style={styles.listPane}>{list}</View>
+          <View style={styles.detailPane}>
+            {selected ? (
+              <DocumentDetailScreen
+                key={selected}
+                embedded
+                navigation={root as never}
+                route={{ key: `embedded-${selected}`, name: 'DocumentDetail', params: { id: selected } }}
+              />
+            ) : (
+              <EmptyState title={t('inbox.selectTitle')} body={t('inbox.selectBody')} />
+            )}
+          </View>
+        </View>
+      ) : (
+        list
+      )}
       <NewDocumentSheet ref={sheet} onSelect={create} />
     </View>
   );
@@ -392,10 +429,24 @@ export function InboxScreen({ navigation, route }: DrawerProps<'Inbox'>) {
 
 const Separator = () => <Divider inset={68} />;
 
+const TWO_PANE_MIN = 1000;
+
 const styles = StyleSheet.create(theme => ({
   screen: {
     flex: 1,
     backgroundColor: theme.colors.bg.app,
+  },
+  panes: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  listPane: {
+    width: 400,
+    borderRightWidth: StyleSheet.hairlineWidth,
+    borderRightColor: theme.colors.border.subtle,
+  },
+  detailPane: {
+    flex: 1,
   },
   list: {
     paddingBottom: 120,

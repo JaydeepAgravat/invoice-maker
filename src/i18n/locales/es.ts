@@ -63,6 +63,8 @@ const es: Messages = {
         body: 'Las facturas pasan aquí cuando se cobran por completo.',
       },
     },
+    selectTitle: 'Elige un documento',
+    selectBody: 'Se abre aquí, junto a la lista.',
   },
   new: {
     button: 'Nuevo',
@@ -846,7 +848,76 @@ const es: Messages = {
     stopped: 'Esta factura ya no se repite',
     saved: 'Próxima factura el {{date}}',
   },
+  paywall: {
+    title: 'Desbloquéalo todo, una vez',
+    subtitle: 'Pagas una vez y es tuyo. Sin suscripción.',
+    sendsReached: 'Has enviado {{count}} documentos este mes. El plan gratuito incluye {{count}} al mes.',
+    buy: 'Desbloquear por {{price}}',
+    buying: 'Abriendo Google Play…',
+    once: 'Un solo pago con Google Play. Sin suscripción.',
+    restore: 'Restaurar compra',
+    dataPromise: 'Todo lo que creas sigue siendo tuyo, con o sin Pro.',
+    thanks: 'Pro desbloqueado. Gracias.',
+    restored: 'Pro restaurado',
+    nothingToRestore: 'No hay compras en esta cuenta de Google',
+    unavailable: 'Las compras aún no están disponibles. Inténtalo más tarde.',
+    failed: 'La compra no se completó. No se te ha cobrado.',
+    see: 'Ver qué incluye Pro',
+    reportsTitle: 'Conoce cómo va tu negocio',
+    reportsBody: 'Beneficio, ingresos por mes y cliente, impuestos repercutidos y quién te debe, con exportación a PDF y hoja de cálculo.',
+    rows: {
+      sends: {
+        title: 'Envíos ilimitados',
+        body: 'El plan gratuito incluye {{count}} documentos al mes',
+      },
+      look: {
+        title: 'Todas las plantillas y colores',
+        body: 'Plantillas Moderna y Audaz, el color de tu marca',
+      },
+      photos: {
+        title: 'Fotos y firmas del cliente',
+        body: 'Fotos del trabajo y firma en tu teléfono',
+      },
+      reports: {
+        title: 'Informes y exportación',
+        body: 'Beneficio, impuestos, lo pendiente, CSV y PDF',
+      },
+      money: {
+        title: 'Gastos y kilometraje',
+        body: 'Tickets y trayectos listos para los impuestos',
+      },
+      docs: {
+        title: 'Órdenes de cambio y de compra, estados de cuenta',
+        body: 'Para trabajos grandes y clientes habituales',
+      },
+      backup: {
+        title: 'Copia automática en Drive',
+        body: 'Cada semana, sin pensar en ello',
+      },
+      footer: {
+        title: 'Sin pie «Creado con»',
+        body: 'Tus documentos solo llevan tu marca',
+      },
+    },
+  },
+  lock: {
+    title: 'Desbloquear {{app}}',
+    subtitle: 'Usa tu huella, tu cara o el bloqueo de pantalla',
+    locked: '{{app}} está bloqueada',
+    unlock: 'Desbloquear',
+    setting: 'Bloqueo de la app',
+    settingHint: 'Pide tu huella, cara o bloqueo de pantalla al abrir la app',
+    noScreenLock: 'Configura primero un bloqueo de pantalla en los ajustes del teléfono.',
+  },
+  widget: {
+    overdue: '{{amount}} vencido',
+    nothingOverdue: 'Nada vencido',
+  },
   settings: {
+    homeScreen: 'Pantalla de inicio',
+    addWidget: 'Añadir widget',
+    addWidgetHint: 'Lo pendiente y un acceso a «Nueva factura»',
+    widgetManual: 'Mantén pulsada la pantalla de inicio, toca Widgets y busca esta app.',
     appearance: 'Apariencia',
     theme: 'Tema',
     themeSystem: 'Sistema',
@@ -861,6 +932,7 @@ const es: Messages = {
     business: 'Negocio',
     devPro: 'Funciones Pro (pruebas)',
     data: 'Datos',
+    security: 'Seguridad',
   },
 };
 

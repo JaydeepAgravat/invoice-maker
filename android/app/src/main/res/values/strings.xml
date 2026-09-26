@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">InvoiceApp</string>
     <string name="reminders_channel">Reminders</string>
+    <string name="widget_label">Outstanding</string>
+    <string name="widget_description">What clients still owe you, and a quick way to invoice</string>
 </resources>

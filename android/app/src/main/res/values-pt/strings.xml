@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="reminders_channel">Lembretes</string>
+    <string name="widget_label">A receber</string>
+    <string name="widget_description">O que seus clientes devem e um atalho para faturar</string>
 </resources>

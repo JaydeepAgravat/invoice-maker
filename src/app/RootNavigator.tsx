@@ -26,6 +26,7 @@ import { TripEditorScreen } from '@/features/mileage/TripEditorScreen';
 import { ReportsScreen } from '@/features/reports/ReportsScreen';
 import { SignatureScreen } from '@/features/signature/SignatureScreen';
 import { BackupScreen } from '@/features/backup/BackupScreen';
+import { PaywallScreen } from '@/features/paywall/PaywallScreen';
 import { ImportScreen } from '@/features/backup/ImportScreen';
 import { BusinessProfileScreen } from '@/features/settings/BusinessProfileScreen';
 import { PaymentMethodEditorScreen } from '@/features/settings/PaymentMethodEditorScreen';
@@ -122,6 +123,11 @@ export function RootNavigator() {
       />
       <Stack.Screen name="PaymentMethods" component={PaymentMethodsScreen} />
       <Stack.Screen name="Backup" component={BackupScreen} />
+      <Stack.Screen
+        name="Paywall"
+        component={PaywallScreen}
+        options={{ animation: 'slide_from_bottom', presentation: 'modal' }}
+      />
       <Stack.Screen
         name="Import"
         component={ImportScreen}

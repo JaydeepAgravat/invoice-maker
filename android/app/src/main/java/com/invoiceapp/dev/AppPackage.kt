@@ -8,10 +8,12 @@ import com.facebook.react.module.model.ReactModuleInfoProvider
 import com.invoiceapp.dev.backup.BackupModule
 import com.invoiceapp.dev.drive.DriveModule
 import com.invoiceapp.dev.haptics.HapticsModule
+import com.invoiceapp.dev.lock.LockModule
 import com.invoiceapp.dev.media.MediaModule
 import com.invoiceapp.dev.pdf.PdfModule
 import com.invoiceapp.dev.reminders.RemindersModule
 import com.invoiceapp.dev.share.ShareModule
+import com.invoiceapp.dev.widget.WidgetModule
 
 /** Registers the app's own Turbo Modules. */
 class AppPackage : BaseReactPackage() {
@@ -25,6 +27,8 @@ class AppPackage : BaseReactPackage() {
       BackupModule.NAME -> BackupModule(reactContext)
       DriveModule.NAME -> DriveModule(reactContext)
       RemindersModule.NAME -> RemindersModule(reactContext)
+      LockModule.NAME -> LockModule(reactContext)
+      WidgetModule.NAME -> WidgetModule(reactContext)
       else -> null
     }
 
@@ -37,6 +41,8 @@ class AppPackage : BaseReactPackage() {
       BackupModule.NAME,
       DriveModule.NAME,
       RemindersModule.NAME,
+      LockModule.NAME,
+      WidgetModule.NAME,
     )
       .associateWith { turboModuleInfo(it) }
   }

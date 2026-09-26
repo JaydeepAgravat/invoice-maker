@@ -1,9 +1,4 @@
-import {
-  FileSpreadsheet,
-  FileText,
-  Menu,
-  Share2,
-} from 'lucide-react-native';
+import { FileSpreadsheet, FileText, Menu, Share2 } from 'lucide-react-native';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, View, useWindowDimensions } from 'react-native';
@@ -16,12 +11,10 @@ import { useProfile } from '@/data/ProfileProvider';
 import { loadReport, reportCurrencies } from '@/data/repositories/reports';
 import { isExpenseCategory } from '@/domain/expenses';
 import { formatMoney, RATE_SCALE } from '@/domain/money';
-import {
-  periodFor,
-  previousPeriod,
-  type PeriodKey,
-} from '@/domain/reports';
+import { periodFor, previousPeriod, type PeriodKey } from '@/domain/reports';
 import { useFormat } from '@/lib/format';
+import { useIsPro } from '@/billing/entitlement';
+import { ProTeaser } from '@/features/paywall/ProTeaser';
 import { renderReportHtml, type ReportLabels } from '@/pdf/reportHtml';
 import NativePdf from '@/specs/NativePdf';
 import NativeShare from '@/specs/NativeShare';
@@ -64,6 +57,7 @@ export function ReportsScreen({ navigation }: DrawerProps<'Reports'>) {
   const [periodKey, setPeriodKey] = useState<PeriodKey>('THIS_YEAR');
   const [picked, setPicked] = useState<string | null>(null);
   const exportSheet = useRef<SheetRef>(null);
+  const pro = useIsPro();
 
   const { data: currencies } = useLiveQuery(db => reportCurrencies(db), []);
   const currency = picked ?? profile.currency;
@@ -84,20 +78,28 @@ export function ReportsScreen({ navigation }: DrawerProps<'Reports'>) {
   const money = (minor: number) =>
     formatMoney(minor, { locale: f.locale, currency });
   const pct = (ppm: number) =>
-    new Intl.NumberFormat(f.locale, { style: 'percent', maximumFractionDigits: 3 }).format(
-      ppm / RATE_SCALE,
-    );
+    new Intl.NumberFormat(f.locale, {
+      style: 'percent',
+      maximumFractionDigits: 3,
+    }).format(ppm / RATE_SCALE);
   const monthName = (key: string) =>
-    new Intl.DateTimeFormat(f.locale, { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(
-      new Date(`${key}-01T00:00:00Z`),
-    );
+    new Intl.DateTimeFormat(f.locale, {
+      month: 'long',
+      year: 'numeric',
+      timeZone: 'UTC',
+    }).format(new Date(`${key}-01T00:00:00Z`));
   const r = data?.current;
   const delta =
     r && data.before.profit !== 0
       ? (r.profit - data.before.profit) / Math.abs(data.before.profit)
       : null;
   const empty =
-    r && r.income === 0 && r.expenses === 0 && r.mileage === 0 && r.outstanding === 0 && r.invoiced === 0;
+    r &&
+    r.income === 0 &&
+    r.expenses === 0 &&
+    r.mileage === 0 &&
+    r.outstanding === 0 &&
+    r.invoiced === 0;
 
   const agingColors = [
     theme.colors.status.success.solid,
@@ -189,193 +191,232 @@ export function ReportsScreen({ navigation }: DrawerProps<'Reports'>) {
           )
         }
         right={
-          <IconButton
-            testID="reports-export"
-            icon={Share2}
-            label={t('reports.exportTitle')}
-            onPress={() => exportSheet.current?.present()}
-          />
+          !pro ? undefined : (
+            <IconButton
+              testID="reports-export"
+              icon={Share2}
+              label={t('reports.exportTitle')}
+              onPress={() => exportSheet.current?.present()}
+            />
+          )
         }
       />
-      <ScrollView
-        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 48 }]}
-      >
+      {!pro ? (
+        <ProTeaser
+          feature="reports"
+          title={t('paywall.reportsTitle')}
+          body={t('paywall.reportsBody')}
+        />
+      ) : (
         <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.chips}
+          contentContainerStyle={[
+            styles.content,
+            { paddingBottom: insets.bottom + 48 },
+          ]}
         >
-          {PERIOD_ORDER.map(k => (
-            <Chip
-              key={k}
-              label={t(`reports.period.${k}`)}
-              selected={periodKey === k}
-              onPress={() => setPeriodKey(k)}
-            />
-          ))}
-          {(currencies ?? []).length > 1
-            ? currencies!.map(c => (
-                <Chip
-                  key={c}
-                  label={c}
-                  selected={currency === c}
-                  onPress={() => setPicked(c)}
-                />
-              ))
-            : null}
-        </ScrollView>
-
-        {!r ? null : empty ? (
-          <EmptyState title={t('reports.emptyTitle')} body={t('reports.emptyBody')} />
-        ) : (
-          <>
-            <View style={styles.hero}>
-              <Text variant="captionMedium" tone="secondary">
-                {t('reports.profit')}
-              </Text>
-              <Text variant="display" tabular numberOfLines={1} adjustsFontSizeToFit testID="report-profit">
-                {money(r.profit)}
-              </Text>
-              {delta !== null ? (
-                <Text
-                  variant="callout"
-                  tone={delta >= 0 ? 'secondary' : 'danger'}
-                  tabular
-                >
-                  {t('reports.vsBefore', {
-                    change: new Intl.NumberFormat(f.locale, {
-                      style: 'percent',
-                      maximumFractionDigits: 0,
-                      signDisplay: 'exceptZero',
-                    }).format(delta),
-                  })}
-                </Text>
-              ) : null}
-            </View>
-
-            <View style={styles.kpis}>
-              {(
-                [
-                  ['income', r.income],
-                  ['expenses', r.expenses],
-                  ['mileage', r.mileage],
-                ] as const
-              ).map(([k, v]) => (
-                <Surface key={k} style={styles.kpi}>
-                  <Text variant="caption" tone="secondary" numberOfLines={1}>
-                    {t(`reports.${k}`)}
-                  </Text>
-                  <Text variant="headline" tabular numberOfLines={1} adjustsFontSizeToFit>
-                    {money(v)}
-                  </Text>
-                </Surface>
-              ))}
-            </View>
-
-            <SectionHeader title={t('reports.byMonth')} />
-            <Surface style={styles.card}>
-              <MonthBars months={r.months} locale={f.locale} format={money} />
-              <View style={styles.legendRow}>
-                <View style={[styles.swatch, { backgroundColor: theme.colors.accent.solid }]} />
-                <Text variant="caption" tone="secondary">
-                  {t('reports.income')}
-                </Text>
-                <View style={[styles.swatch, { backgroundColor: theme.colors.border.strong }]} />
-                <Text variant="caption" tone="secondary">
-                  {t('reports.expenses')}
-                </Text>
-              </View>
-            </Surface>
-
-            {r.byClient.length ? (
-              <>
-                <SectionHeader title={t('reports.byClient')} />
-                <Surface style={styles.card}>
-                  <RankBars
-                    rows={r.byClient.slice(0, 6).map(c => ({
-                      key: c.clientId ?? '-',
-                      label: c.name ?? t('document.noClient'),
-                      value: c.income,
-                      display: money(c.income),
-                    }))}
-                  />
-                </Surface>
-              </>
-            ) : null}
-
-            <SectionHeader title={t('reports.agingTitle')} />
-            <Surface style={styles.card}>
-              <Text variant="headline" tabular>
-                {money(r.outstanding)}
-              </Text>
-              <StackBar
-                segments={(
-                  [
-                    r.aging.current,
-                    r.aging.days1to30,
-                    r.aging.days31to60,
-                    r.aging.days61to90,
-                    r.aging.days90plus,
-                  ] as number[]
-                ).map((v, i) => ({
-                  key: String(i),
-                  label: agingLabels[i]!,
-                  value: v,
-                  display: money(v),
-                  color: agingColors[i]!,
-                }))}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.chips}
+          >
+            {PERIOD_ORDER.map(k => (
+              <Chip
+                key={k}
+                label={t(`reports.period.${k}`)}
+                selected={periodKey === k}
+                onPress={() => setPeriodKey(k)}
               />
-            </Surface>
-
-            {r.taxCollected.length ? (
-              <>
-                <SectionHeader title={t('reports.taxCollected')} />
-                <Surface style={styles.list}>
-                  {r.taxCollected.map((tx, i) => (
-                    <View key={`${tx.name}-${tx.rate}-${tx.withholding}`}>
-                      {i > 0 ? <Divider inset={16} /> : null}
-                      <ListRow
-                        title={`${tx.name} ${pct(tx.rate)}`}
-                        subtitle={tx.withholding ? t('reports.withheld') : undefined}
-                        value={money(tx.amount)}
-                      />
-                    </View>
-                  ))}
-                </Surface>
-              </>
-            ) : null}
-
-            {r.expensesByCategory.length ? (
-              <>
-                <SectionHeader title={t('reports.byCategory')} />
-                <Surface style={styles.card}>
-                  <RankBars
-                    rows={r.expensesByCategory.map(c => ({
-                      key: c.category,
-                      label: isExpenseCategory(c.category)
-                        ? t(`expenseCategory.${c.category}`)
-                        : c.category,
-                      value: c.amount,
-                      display: money(c.amount),
-                    }))}
+            ))}
+            {(currencies ?? []).length > 1
+              ? currencies!.map(c => (
+                  <Chip
+                    key={c}
+                    label={c}
+                    selected={currency === c}
+                    onPress={() => setPicked(c)}
                   />
-                </Surface>
-              </>
-            ) : null}
+                ))
+              : null}
+          </ScrollView>
 
-            <Text variant="caption" tone="tertiary" style={styles.note}>
-              {t('reports.cashBasis', {
-                invoiced: money(r.invoiced),
-                mileage: t('reports.mileageDistance', {
-                  distance: new Intl.NumberFormat(f.locale, { maximumFractionDigits: 1 }).format(
-                    r.mileageDistance / 1000,
-                  ),
-                }),
-              })}
-            </Text>
-          </>
-        )}
-      </ScrollView>
+          {!r ? null : empty ? (
+            <EmptyState
+              title={t('reports.emptyTitle')}
+              body={t('reports.emptyBody')}
+            />
+          ) : (
+            <>
+              <View style={styles.hero}>
+                <Text variant="captionMedium" tone="secondary">
+                  {t('reports.profit')}
+                </Text>
+                <Text
+                  variant="display"
+                  tabular
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  testID="report-profit"
+                >
+                  {money(r.profit)}
+                </Text>
+                {delta !== null ? (
+                  <Text
+                    variant="callout"
+                    tone={delta >= 0 ? 'secondary' : 'danger'}
+                    tabular
+                  >
+                    {t('reports.vsBefore', {
+                      change: new Intl.NumberFormat(f.locale, {
+                        style: 'percent',
+                        maximumFractionDigits: 0,
+                        signDisplay: 'exceptZero',
+                      }).format(delta),
+                    })}
+                  </Text>
+                ) : null}
+              </View>
+
+              <View style={styles.kpis}>
+                {(
+                  [
+                    ['income', r.income],
+                    ['expenses', r.expenses],
+                    ['mileage', r.mileage],
+                  ] as const
+                ).map(([k, v]) => (
+                  <Surface key={k} style={styles.kpi}>
+                    <Text variant="caption" tone="secondary" numberOfLines={1}>
+                      {t(`reports.${k}`)}
+                    </Text>
+                    <Text
+                      variant="headline"
+                      tabular
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
+                    >
+                      {money(v)}
+                    </Text>
+                  </Surface>
+                ))}
+              </View>
+
+              <SectionHeader title={t('reports.byMonth')} />
+              <Surface style={styles.card}>
+                <MonthBars months={r.months} locale={f.locale} format={money} />
+                <View style={styles.legendRow}>
+                  <View
+                    style={[
+                      styles.swatch,
+                      { backgroundColor: theme.colors.accent.solid },
+                    ]}
+                  />
+                  <Text variant="caption" tone="secondary">
+                    {t('reports.income')}
+                  </Text>
+                  <View
+                    style={[
+                      styles.swatch,
+                      { backgroundColor: theme.colors.border.strong },
+                    ]}
+                  />
+                  <Text variant="caption" tone="secondary">
+                    {t('reports.expenses')}
+                  </Text>
+                </View>
+              </Surface>
+
+              {r.byClient.length ? (
+                <>
+                  <SectionHeader title={t('reports.byClient')} />
+                  <Surface style={styles.card}>
+                    <RankBars
+                      rows={r.byClient.slice(0, 6).map(c => ({
+                        key: c.clientId ?? '-',
+                        label: c.name ?? t('document.noClient'),
+                        value: c.income,
+                        display: money(c.income),
+                      }))}
+                    />
+                  </Surface>
+                </>
+              ) : null}
+
+              <SectionHeader title={t('reports.agingTitle')} />
+              <Surface style={styles.card}>
+                <Text variant="headline" tabular>
+                  {money(r.outstanding)}
+                </Text>
+                <StackBar
+                  segments={(
+                    [
+                      r.aging.current,
+                      r.aging.days1to30,
+                      r.aging.days31to60,
+                      r.aging.days61to90,
+                      r.aging.days90plus,
+                    ] as number[]
+                  ).map((v, i) => ({
+                    key: String(i),
+                    label: agingLabels[i]!,
+                    value: v,
+                    display: money(v),
+                    color: agingColors[i]!,
+                  }))}
+                />
+              </Surface>
+
+              {r.taxCollected.length ? (
+                <>
+                  <SectionHeader title={t('reports.taxCollected')} />
+                  <Surface style={styles.list}>
+                    {r.taxCollected.map((tx, i) => (
+                      <View key={`${tx.name}-${tx.rate}-${tx.withholding}`}>
+                        {i > 0 ? <Divider inset={16} /> : null}
+                        <ListRow
+                          title={`${tx.name} ${pct(tx.rate)}`}
+                          subtitle={
+                            tx.withholding ? t('reports.withheld') : undefined
+                          }
+                          value={money(tx.amount)}
+                        />
+                      </View>
+                    ))}
+                  </Surface>
+                </>
+              ) : null}
+
+              {r.expensesByCategory.length ? (
+                <>
+                  <SectionHeader title={t('reports.byCategory')} />
+                  <Surface style={styles.card}>
+                    <RankBars
+                      rows={r.expensesByCategory.map(c => ({
+                        key: c.category,
+                        label: isExpenseCategory(c.category)
+                          ? t(`expenseCategory.${c.category}`)
+                          : c.category,
+                        value: c.amount,
+                        display: money(c.amount),
+                      }))}
+                    />
+                  </Surface>
+                </>
+              ) : null}
+
+              <Text variant="caption" tone="tertiary" style={styles.note}>
+                {t('reports.cashBasis', {
+                  invoiced: money(r.invoiced),
+                  mileage: t('reports.mileageDistance', {
+                    distance: new Intl.NumberFormat(f.locale, {
+                      maximumFractionDigits: 1,
+                    }).format(r.mileageDistance / 1000),
+                  }),
+                })}
+              </Text>
+            </>
+          )}
+        </ScrollView>
+      )}
 
       <Sheet ref={exportSheet} title={t('reports.exportTitle')}>
         <ListRow
@@ -393,7 +434,9 @@ export function ReportsScreen({ navigation }: DrawerProps<'Reports'>) {
               leadingIcon={FileSpreadsheet}
               title={t(`reports.export.${k}`)}
               subtitle={t('reports.export.csvHint')}
-              onPress={() => run(() => exportCsv({ kind: k, period, locale: f.locale, t }))}
+              onPress={() =>
+                run(() => exportCsv({ kind: k, period, locale: f.locale, t }))
+              }
             />
           </View>
         ))}

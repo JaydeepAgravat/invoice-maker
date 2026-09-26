@@ -63,6 +63,8 @@ const fr: Messages = {
         body: 'Les factures arrivent ici une fois entièrement payées.',
       },
     },
+    selectTitle: 'Choisissez un document',
+    selectBody: 'Il s’ouvre ici, à côté de la liste.',
   },
   new: {
     button: 'Nouveau',
@@ -849,7 +851,76 @@ const fr: Messages = {
     stopped: 'Cette facture n’est plus répétée',
     saved: 'Prochaine facture le {{date}}',
   },
+  paywall: {
+    title: 'Tout débloquer, une fois',
+    subtitle: 'Un seul paiement, pour toujours. Sans abonnement.',
+    sendsReached: 'Vous avez envoyé {{count}} documents ce mois-ci. L’offre gratuite en comprend {{count}} par mois.',
+    buy: 'Débloquer pour {{price}}',
+    buying: 'Ouverture de Google Play…',
+    once: 'Un seul paiement via Google Play. Sans abonnement.',
+    restore: 'Restaurer l’achat',
+    dataPromise: 'Tout ce que vous créez reste à vous, avec ou sans Pro.',
+    thanks: 'Pro débloqué. Merci.',
+    restored: 'Pro restauré',
+    nothingToRestore: 'Aucun achat sur ce compte Google',
+    unavailable: 'Les achats ne sont pas encore disponibles. Réessayez plus tard.',
+    failed: 'L’achat n’a pas abouti. Vous n’avez pas été débité.',
+    see: 'Voir ce que comprend Pro',
+    reportsTitle: 'Suivez la santé de votre activité',
+    reportsBody: 'Bénéfice, encaissements par mois et par client, TVA collectée et impayés, avec exports PDF et tableur.',
+    rows: {
+      sends: {
+        title: 'Envois illimités',
+        body: 'L’offre gratuite comprend {{count}} documents par mois',
+      },
+      look: {
+        title: 'Tous les modèles et couleurs',
+        body: 'Modèles Moderne et Affirmé, la couleur de votre marque',
+      },
+      photos: {
+        title: 'Photos et signature du client',
+        body: 'Photos du chantier, signature sur votre téléphone',
+      },
+      reports: {
+        title: 'Rapports et exports',
+        body: 'Bénéfice, TVA, impayés, CSV et PDF',
+      },
+      money: {
+        title: 'Dépenses et kilométrage',
+        body: 'Justificatifs et trajets prêts pour la déclaration',
+      },
+      docs: {
+        title: 'Avenants, bons de commande, relevés',
+        body: 'Pour les gros chantiers et les clients réguliers',
+      },
+      backup: {
+        title: 'Sauvegarde Drive automatique',
+        body: 'Chaque semaine, sans y penser',
+      },
+      footer: {
+        title: 'Sans mention « Créé avec »',
+        body: 'Vos documents ne portent que votre marque',
+      },
+    },
+  },
+  lock: {
+    title: 'Déverrouiller {{app}}',
+    subtitle: 'Utilisez votre empreinte, votre visage ou le verrouillage de l’écran',
+    locked: '{{app}} est verrouillée',
+    unlock: 'Déverrouiller',
+    setting: 'Verrouillage de l’appli',
+    settingHint: 'Demande l’empreinte, le visage ou le code du téléphone à l’ouverture',
+    noScreenLock: 'Configurez d’abord un verrouillage d’écran dans les réglages du téléphone.',
+  },
+  widget: {
+    overdue: '{{amount}} en retard',
+    nothingOverdue: 'Rien en retard',
+  },
   settings: {
+    homeScreen: 'Écran d’accueil',
+    addWidget: 'Ajouter le widget',
+    addWidgetHint: 'Ce qui reste à encaisser et « Nouvelle facture »',
+    widgetManual: 'Appuyez longuement sur l’écran d’accueil, touchez Widgets et cherchez cette appli.',
     appearance: 'Apparence',
     theme: 'Thème',
     themeSystem: 'Système',
@@ -865,6 +936,7 @@ const fr: Messages = {
     business: 'Entreprise',
     devPro: 'Fonctions Pro (test)',
     data: 'Données',
+    security: 'Sécurité',
   },
 };
 

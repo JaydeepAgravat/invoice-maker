@@ -17,4 +17,5 @@ export const PrefKeys = {
   driveError: 'backup.driveError',
   nudgeDismissedAt: 'backup.nudgeDismissedAt',
   overdueReminders: 'reminders.overdue',
+  appLock: 'security.appLock',
 } as const;
