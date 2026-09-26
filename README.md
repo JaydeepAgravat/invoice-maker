@@ -4,6 +4,7 @@ Offline invoice, estimate and receipt maker for Android. Bare React Native (no E
 
 - Product spec: [docs/PRODUCT_SPEC.md](docs/PRODUCT_SPEC.md)
 - Build plan and locked decisions: [docs/BUILD_PLAN.md](docs/BUILD_PLAN.md)
+- Current status: [docs/STATUS.md](docs/STATUS.md)
 - Launch: [docs/launch/SETUP_CHECKLIST.md](docs/launch/SETUP_CHECKLIST.md) (accounts and keys still needed),
   store listing, privacy policy, terms and Play data safety answers in [docs/launch](docs/launch)
 
