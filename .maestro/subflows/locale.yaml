@@ -1,0 +1,32 @@
+# Switches the UI language through Settings, then checks the main screens
+# render in it. Driven by testIDs so it works in every language.
+appId: com.invoiceapp.dev
+---
+- tapOn:
+    id: "open-menu"
+- tapOn:
+    id: "nav-settings"
+- scrollUntilVisible:
+    element:
+      id: "language-${CODE}"
+- tapOn:
+    id: "language-${CODE}"
+- assertVisible: "${THEME}"
+- scrollUntilVisible:
+    element: "${SETTINGS}"
+    direction: UP
+- tapOn:
+    id: "open-menu"
+- assertVisible: "${REPORTS}"
+- tapOn:
+    id: "nav-view-all"
+- assertVisible: "${DOCUMENTS}"
+- tapOn:
+    id: "new-document"
+- assertVisible: "${ESTIMATE}"
+- pressKey: back
+- tapOn:
+    id: "open-menu"
+- tapOn:
+    id: "nav-reports"
+- assertVisible: "${REPORTS}"

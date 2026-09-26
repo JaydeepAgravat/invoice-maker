@@ -48,7 +48,7 @@ class InvoiceWidget : GlanceAppWidget() {
     val primary = ColorProvider(day = Color(0xFF1C2024), night = Color(0xFFEDEEF0))
     val secondary = ColorProvider(day = Color(0xFF60646C), night = Color(0xFFB0B4BA))
     val danger = ColorProvider(day = Color(0xFFCE2C31), night = Color(0xFFFF9592))
-    val accent = ColorProvider(day = Color(0xFF3E63DD), night = Color(0xFF5472E4))
+    val accent = ColorProvider(day = Color(0xFF5B5BD6), night = Color(0xFF5B5BD6))
     val onAccent = ColorProvider(day = Color.White, night = Color.White)
 
     val open = Intent(Intent.ACTION_VIEW, Uri.parse("invoiceapp://inbox/unpaid"))

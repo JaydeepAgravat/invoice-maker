@@ -8,6 +8,7 @@ import { StyleSheet } from 'react-native-unistyles';
 import type { DrawerProps } from '@/app/navigation';
 import { useLiveQuery } from '@/data/live';
 import { listClients } from '@/data/repositories/clients';
+import { EmptyClients } from '@/ui/illustrations';
 import { ScreenHeader } from '@/ui/layout/ScreenHeader';
 import { SearchField } from '@/ui/layout/SearchField';
 import {
@@ -36,6 +37,7 @@ export function ClientsScreen({ navigation }: DrawerProps<'Clients'>) {
         left={
           width >= breakpoints.lg ? undefined : (
             <IconButton
+              testID="open-menu"
               icon={Menu}
               label={t('common.openMenu')}
               onPress={navigation.openDrawer}
@@ -87,6 +89,7 @@ export function ClientsScreen({ navigation }: DrawerProps<'Clients'>) {
               />
             ) : (
               <EmptyState
+                illustration={<EmptyClients />}
                 title={t('client.emptyTitle')}
                 body={t('client.emptyBody')}
                 action={{

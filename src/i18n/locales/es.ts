@@ -914,6 +914,12 @@ const es: Messages = {
     nothingOverdue: 'Nada vencido',
   },
   settings: {
+    about: 'Información',
+    support: 'Contactar con soporte',
+    privacyPolicy: 'Política de privacidad',
+    terms: 'Condiciones de uso',
+    crashReports: 'Enviar informes de errores',
+    crashReportsHint: 'Anónimos. Nunca incluyen tus documentos, clientes ni importes.',
     homeScreen: 'Pantalla de inicio',
     addWidget: 'Añadir widget',
     addWidgetHint: 'Lo pendiente y un acceso a «Nueva factura»',
@@ -932,7 +938,7 @@ const es: Messages = {
     business: 'Negocio',
     devPro: 'Funciones Pro (pruebas)',
     data: 'Datos',
-    security: 'Seguridad',
+    security: 'Privacidad y seguridad',
   },
 };
 

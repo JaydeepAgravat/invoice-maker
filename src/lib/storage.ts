@@ -18,4 +18,5 @@ export const PrefKeys = {
   nudgeDismissedAt: 'backup.nudgeDismissedAt',
   overdueReminders: 'reminders.overdue',
   appLock: 'security.appLock',
+  crashReports: 'privacy.crashReports',
 } as const;

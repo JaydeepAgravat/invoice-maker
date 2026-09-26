@@ -1,24 +1,45 @@
 import { useIsFocused, useNavigation } from '@react-navigation/native';
-import { Bell, Building2, LayoutDashboard, LockKeyhole, Check, CloudUpload, CreditCard, Crown, LayoutGrid, Menu } from 'lucide-react-native';
+import {
+  Bell,
+  Bug,
+  Building2,
+  Check,
+  CloudUpload,
+  CreditCard,
+  Crown,
+  FileText,
+  Languages,
+  LayoutDashboard,
+  LayoutGrid,
+  LockKeyhole,
+  Mail,
+  Menu,
+  Shield,
+} from 'lucide-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, View, useWindowDimensions } from 'react-native';
+import { Linking, ScrollView, View, useWindowDimensions } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
 
 import type { DrawerProps } from '@/app/navigation';
 import { lastBackup } from '@/backup/service';
-import { APP_NAME } from '@/config';
-import NativeLock from '@/specs/NativeLock';
-import NativeWidget from '@/specs/NativeWidget';
-import { toast } from '@/ui/toast/store';
 import { setPro, useIsPro } from '@/billing/entitlement';
-import { ensureNotificationPermission } from '@/features/documents/RecurringSheet';
+import { APP_NAME, PRIVACY_URL, SUPPORT_EMAIL, TERMS_URL } from '@/config';
 import { useLiveQuery } from '@/data/live';
 import { useProfile } from '@/data/ProfileProvider';
 import { listPaymentMethods } from '@/data/repositories/paymentMethods';
 import { DevDataTools } from '@/features/dev/DevDataTools';
-import { SUPPORTED_LANGUAGES, setLanguage, type Language } from '@/i18n';
+import { ensureNotificationPermission } from '@/features/documents/RecurringSheet';
+import {
+  SUPPORTED_LANGUAGES,
+  setLanguage,
+  setPseudoLocale,
+  type Language,
+} from '@/i18n';
 import { PrefKeys, prefs } from '@/lib/storage';
+import NativeLock from '@/specs/NativeLock';
+import NativeWidget from '@/specs/NativeWidget';
+import { crashReportsEnabled, setCrashReportsEnabled } from '@/telemetry';
 import { haptics } from '@/ui/haptics';
 import { ScreenHeader } from '@/ui/layout/ScreenHeader';
 import {
@@ -32,6 +53,7 @@ import {
   Switch,
   Text,
 } from '@/ui/primitives';
+import { toast } from '@/ui/toast/store';
 import {
   applyThemePreference,
   breakpoints,
@@ -49,7 +71,7 @@ const LANGUAGE_NAMES: Record<Language, string> = {
 };
 
 export function SettingsScreen({ navigation }: DrawerProps<'Settings'>) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const root = useNavigation();
   const { width } = useWindowDimensions();
   const [theme, setTheme] = useState<ThemePreference>(readThemePreference);
@@ -77,13 +99,23 @@ export function SettingsScreen({ navigation }: DrawerProps<'Settings'>) {
         return;
       }
       // Prove it works before relying on it.
-      if (!(await NativeLock.authenticate(t('lock.title', { app: APP_NAME }), t('lock.subtitle')))) {
+      if (
+        !(await NativeLock.authenticate(
+          t('lock.title', { app: APP_NAME }),
+          t('lock.subtitle'),
+        ))
+      ) {
         return;
       }
     }
     prefs.set(PrefKeys.appLock, next);
     NativeLock.setSecureRecents(next);
     setLock(next);
+  };
+  const [crashReports, setCrashReports] = useState(crashReportsEnabled);
+  const toggleCrashReports = (next: boolean) => {
+    setCrashReportsEnabled(next);
+    setCrashReports(next);
   };
   const toggleOverdue = async (next: boolean) => {
     if (next && !(await ensureNotificationPermission())) {
@@ -92,6 +124,33 @@ export function SettingsScreen({ navigation }: DrawerProps<'Settings'>) {
     prefs.set(PrefKeys.overdueReminders, next);
     setOverdue(next);
   };
+  // Rows appear once the value is set in src/config.ts.
+  const aboutRows = [
+    {
+      key: 'support',
+      value: SUPPORT_EMAIL,
+      icon: Mail,
+      title: t('settings.support'),
+      subtitle: SUPPORT_EMAIL,
+      url: `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(APP_NAME)}`,
+    },
+    {
+      key: 'privacy',
+      value: PRIVACY_URL,
+      icon: Shield,
+      title: t('settings.privacyPolicy'),
+      subtitle: undefined,
+      url: PRIVACY_URL,
+    },
+    {
+      key: 'terms',
+      value: TERMS_URL,
+      icon: FileText,
+      title: t('settings.terms'),
+      subtitle: undefined,
+      url: TERMS_URL,
+    },
+  ].filter(row => row.value);
   const { data: methods } = useLiveQuery(db => listPaymentMethods(db), []);
 
   const chooseLanguage = (next: Language | null) => {
@@ -107,6 +166,7 @@ export function SettingsScreen({ navigation }: DrawerProps<'Settings'>) {
         left={
           width >= breakpoints.lg ? undefined : (
             <IconButton
+              testID="open-menu"
               icon={Menu}
               label={t('common.openMenu')}
               onPress={navigation.openDrawer}
@@ -208,6 +268,21 @@ export function SettingsScreen({ navigation }: DrawerProps<'Settings'>) {
               />
             }
           />
+          <Divider inset={52} />
+          <ListRow
+            testID="settings-crash-reports"
+            leadingIcon={Bug}
+            title={t('settings.crashReports')}
+            subtitle={t('settings.crashReportsHint')}
+            onPress={() => toggleCrashReports(!crashReports)}
+            trailing={
+              <Switch
+                value={crashReports}
+                onValueChange={toggleCrashReports}
+                accessibilityLabel={t('settings.crashReports')}
+              />
+            }
+          />
         </Surface>
 
         <SectionHeader title={t('settings.appearance')} />
@@ -254,6 +329,7 @@ export function SettingsScreen({ navigation }: DrawerProps<'Settings'>) {
         <Surface style={styles.card}>
           <ListRow
             title={t('settings.languageSystem')}
+            testID="language-system"
             onPress={() => chooseLanguage(null)}
             trailing={
               language === null ? (
@@ -265,6 +341,7 @@ export function SettingsScreen({ navigation }: DrawerProps<'Settings'>) {
             <View key={code}>
               <Divider inset={16} />
               <ListRow
+                testID={`language-${code}`}
                 title={LANGUAGE_NAMES[code]}
                 onPress={() => chooseLanguage(code)}
                 trailing={
@@ -276,6 +353,28 @@ export function SettingsScreen({ navigation }: DrawerProps<'Settings'>) {
             </View>
           ))}
         </Surface>
+
+        {aboutRows.length ? (
+          <>
+            <SectionHeader title={t('settings.about')} />
+            <Surface style={styles.card}>
+              {aboutRows.map((row, i) => (
+                <View key={row.key}>
+                  {i > 0 ? <Divider inset={52} /> : null}
+                  <ListRow
+                    leadingIcon={row.icon}
+                    title={row.title}
+                    subtitle={row.subtitle}
+                    showChevron
+                    onPress={() =>
+                      Linking.openURL(row.url).catch(() => undefined)
+                    }
+                  />
+                </View>
+              ))}
+            </Surface>
+          </>
+        ) : null}
 
         {__DEV__ ? (
           <>
@@ -299,6 +398,14 @@ export function SettingsScreen({ navigation }: DrawerProps<'Settings'>) {
                     accessibilityLabel={t('settings.devPro')}
                   />
                 }
+              />
+              <Divider inset={52} />
+              {/* Dev only, so not translated: lengthens every string to catch overflow. */}
+              <ListRow
+                testID="dev-pseudo"
+                title="Pseudo-locale (+40%)"
+                leadingIcon={Languages}
+                onPress={() => setPseudoLocale(i18n.language !== 'qps')}
               />
               <Divider inset={52} />
               <DevDataTools />

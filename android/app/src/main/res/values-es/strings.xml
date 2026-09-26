@@ -3,4 +3,7 @@
     <string name="reminders_channel">Recordatorios</string>
     <string name="widget_label">Pendiente</string>
     <string name="widget_description">Lo que te deben tus clientes y un acceso rápido para facturar</string>
+    <string name="widget_preview_amount">4250,00 €</string>
+    <string name="widget_preview_overdue">2 vencidas</string>
+    <string name="widget_new">+  Nueva factura</string>
 </resources>

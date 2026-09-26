@@ -245,6 +245,7 @@ export function InboxScreen({ navigation, route }: DrawerProps<'Inbox'>) {
         left={
           permanentDrawer ? undefined : (
             <IconButton
+              testID="open-menu"
               icon={Menu}
               label={t('common.openMenu')}
               onPress={navigation.openDrawer}
@@ -289,7 +290,7 @@ export function InboxScreen({ navigation, route }: DrawerProps<'Inbox'>) {
                     summary.outstanding.text
                   }`}
                 >
-                  <Text variant="caption" tone="secondary">
+                  <Text variant="caption" tone="secondary" numberOfLines={2}>
                     {t('inbox.outstanding')}
                   </Text>
                   <Text
@@ -317,7 +318,7 @@ export function InboxScreen({ navigation, route }: DrawerProps<'Inbox'>) {
                     summary.overdue?.text ?? f.money(0)
                   }`}
                 >
-                  <Text variant="caption" tone="secondary">
+                  <Text variant="caption" tone="secondary" numberOfLines={2}>
                     {t('inbox.overdue')}
                   </Text>
                   <Text
@@ -339,7 +340,7 @@ export function InboxScreen({ navigation, route }: DrawerProps<'Inbox'>) {
                     summary.paid?.text ?? f.money(0)
                   }`}
                 >
-                  <Text variant="caption" tone="secondary" numberOfLines={1}>
+                  <Text variant="caption" tone="secondary" numberOfLines={2}>
                     {t('inbox.paidThisMonth')}
                   </Text>
                   <Text
@@ -463,6 +464,8 @@ const styles = StyleSheet.create(theme => ({
   stat: {
     flex: 1,
     gap: 2,
+    // Labels may wrap in longer languages; keep the amounts on one baseline.
+    justifyContent: 'space-between',
     padding: theme.space[3],
     borderRadius: theme.radius.lg,
     borderWidth: theme.stroke.thin,

@@ -4,6 +4,8 @@ Offline invoice, estimate and receipt maker for Android. Bare React Native (no E
 
 - Product spec: [docs/PRODUCT_SPEC.md](docs/PRODUCT_SPEC.md)
 - Build plan and locked decisions: [docs/BUILD_PLAN.md](docs/BUILD_PLAN.md)
+- Launch: [docs/launch/SETUP_CHECKLIST.md](docs/launch/SETUP_CHECKLIST.md) (accounts and keys still needed),
+  store listing, privacy policy, terms and Play data safety answers in [docs/launch](docs/launch)
 
 ## Setup
 
@@ -31,6 +33,27 @@ Release builds never include this permission.
 npm run typecheck
 npm run lint
 npm test
+~/.maestro/bin/maestro test .maestro/   # end-to-end, needs the emulator + Metro
+```
+
+Development-only tools live in Settings → Developer: component gallery, a Pro
+toggle, a 1,000-document seed and a pseudo-locale (+40% text) for overflow checks.
+
+## Release builds
+
+```bash
+cd android && ./gradlew bundleRelease   # Play upload (.aab)
+cd android && ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a   # quick device test
+```
+
+R8 shrinking is on. After adding a native dependency, run the release build on a
+device before shipping: missing keep rules only show up there
+(`android/app/proguard-rules.pro`).
+
+Before the first upload, set the brand and package ID once:
+
+```bash
+scripts/rename.sh com.yourbrand.invoice "Your Brand"
 ```
 
 ## Structure

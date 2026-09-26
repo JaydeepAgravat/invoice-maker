@@ -17,6 +17,7 @@ import {
 import { isExpenseCategory } from '@/domain/expenses';
 import { NewButton } from '@/features/inbox/NewButton';
 import { useFormat } from '@/lib/format';
+import { EmptyExpenses } from '@/ui/illustrations';
 import { ScreenHeader } from '@/ui/layout/ScreenHeader';
 import {
   Divider,
@@ -94,6 +95,7 @@ export function ExpensesScreen({ navigation }: DrawerProps<'Expenses'>) {
         left={
           width >= breakpoints.lg ? undefined : (
             <IconButton
+              testID="open-menu"
               icon={Menu}
               label={t('common.openMenu')}
               onPress={navigation.openDrawer}
@@ -103,6 +105,7 @@ export function ExpensesScreen({ navigation }: DrawerProps<'Expenses'>) {
       />
       {expenses && expenses.length === 0 ? (
         <EmptyState
+          illustration={<EmptyExpenses />}
           title={t('expenses.emptyTitle')}
           body={t('expenses.emptyBody')}
         />

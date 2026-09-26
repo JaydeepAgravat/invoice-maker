@@ -8,3 +8,4 @@ executionOrder:
     - 04_payment_details_preview_share
     - 05_expenses_mileage_reports_signature
     - 06_backup_recurring
+    - 07_locales

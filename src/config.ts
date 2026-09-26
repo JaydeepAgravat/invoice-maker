@@ -23,3 +23,9 @@ export const FREE_SENDS_PER_MONTH = 5;
 export const SUPPORT_EMAIL = '';
 export const PRIVACY_URL = '';
 export const TERMS_URL = '';
+
+/**
+ * Sentry project DSN for crash reports. Empty until the Sentry project
+ * exists; crash reporting stays off while it is empty.
+ */
+export const SENTRY_DSN = '';

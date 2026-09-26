@@ -25,6 +25,7 @@ import {
   type PaymentMethod,
 } from '@/domain/payments';
 import { pdfLabels } from '@/pdf/labels';
+import { EmptyPayments } from '@/ui/illustrations';
 import { ScreenHeader } from '@/ui/layout/ScreenHeader';
 import {
   Badge,
@@ -88,6 +89,7 @@ export function PaymentMethodsScreen({
       />
       {methods && methods.length === 0 ? (
         <EmptyState
+          illustration={<EmptyPayments />}
           title={t('paymentDetails.emptyTitle')}
           body={t('paymentDetails.emptyBody')}
           action={{

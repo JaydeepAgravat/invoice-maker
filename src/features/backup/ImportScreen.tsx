@@ -23,6 +23,7 @@ import {
 import { useFormat } from '@/lib/format';
 import NativeBackup from '@/specs/NativeBackup';
 import NativeMedia from '@/specs/NativeMedia';
+import { EmptyImport } from '@/ui/illustrations';
 import { ScreenHeader } from '@/ui/layout/ScreenHeader';
 import {
   Badge,
@@ -135,6 +136,7 @@ export function ImportScreen({ navigation, route }: RootScreenProps<'Import'>) {
       {!table ? (
         <View style={styles.intro}>
           <EmptyState
+            illustration={<EmptyImport />}
             title={target === 'clients' ? t('import.introClients') : t('import.introItems')}
             body={t('import.introBody')}
           />

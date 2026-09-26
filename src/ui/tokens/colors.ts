@@ -70,13 +70,13 @@ const status = {
       bg: '#E6F6EB',
       border: '#B2DDB5',
       solid: '#30A46C',
-      text: '#218358',
+      text: '#1C7A52', // Radix 11 is 4.2:1 on its fill; nudged to AA
     },
     amber: {
       bg: '#FFF7C2',
       border: '#F3D673',
       solid: '#FFC53D',
-      text: '#AB6400',
+      text: '#9A5A00', // Radix 11 is 4.3:1 on its fill; nudged to AA
     },
     red: {
       bg: '#FEEBEC',
@@ -88,7 +88,7 @@ const status = {
       bg: '#E6F4FE',
       border: '#ACD8FC',
       solid: '#0090FF',
-      text: '#0D74CE',
+      text: '#0B68BB', // Radix 11 is 4.3:1 on its fill; nudged to AA
     },
   },
   dark: {
@@ -182,7 +182,8 @@ export const lightColors: ColorTokens = {
   text: {
     primary: slateLight[12],
     secondary: slateLight[11],
-    tertiary: slateLight[9],
+    // Step 9 is 3.2:1 on the app background; hint text needs AA (4.5:1).
+    tertiary: '#6F727B',
     disabled: slateLight[8],
     inverse: slateLight[1],
     accent: accentLight[11],
@@ -233,7 +234,8 @@ export const darkColors: ColorTokens = {
   text: {
     primary: slateDark[12],
     secondary: slateDark[11],
-    tertiary: slateDark[9],
+    // Step 9 is 3.7:1 on the app background; hint text needs AA (4.5:1).
+    tertiary: '#8B8F98',
     disabled: slateDark[7],
     inverse: slateDark[1],
     accent: accentDark[11],

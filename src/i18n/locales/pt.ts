@@ -914,6 +914,12 @@ const pt: Messages = {
     nothingOverdue: 'Nada vencido',
   },
   settings: {
+    about: 'Sobre',
+    support: 'Falar com o suporte',
+    privacyPolicy: 'Política de privacidade',
+    terms: 'Termos de uso',
+    crashReports: 'Enviar relatórios de erros',
+    crashReportsHint: 'Anônimos. Nunca incluem seus documentos, clientes ou valores.',
     homeScreen: 'Tela inicial',
     addWidget: 'Adicionar widget',
     addWidgetHint: 'O que falta receber e um atalho para nova fatura',
@@ -932,7 +938,7 @@ const pt: Messages = {
     business: 'Empresa',
     devPro: 'Recursos Pro (testes)',
     data: 'Dados',
-    security: 'Segurança',
+    security: 'Privacidade e segurança',
   },
 };
 

@@ -58,7 +58,9 @@ function NavItem({
   active,
   count,
   onPress,
+  testID,
 }: {
+  testID?: string;
   label: string;
   icon: LucideIcon;
   tone?: IconTone;
@@ -68,6 +70,7 @@ function NavItem({
 }) {
   return (
     <Touchable
+      testID={testID}
       onPress={onPress}
       feedback="highlight"
       accessibilityRole="button"
@@ -158,6 +161,7 @@ export function AppDrawer({ state, navigation }: DrawerContentComponentProps) {
         {VIEWS.map(v => (
           <NavItem
             key={v.view}
+            testID={`nav-view-${v.view}`}
             label={t(`views.${v.view}`)}
             icon={v.icon}
             tone={v.tone}
@@ -172,6 +176,7 @@ export function AppDrawer({ state, navigation }: DrawerContentComponentProps) {
         {WORKSPACE.map(d => (
           <NavItem
             key={d.route}
+            testID={`nav-${d.route.toLowerCase()}`}
             label={t(`nav.${d.route.toLowerCase() as 'clients' | 'items'}`)}
             icon={d.icon}
             active={current?.name === d.route}
@@ -185,6 +190,7 @@ export function AppDrawer({ state, navigation }: DrawerContentComponentProps) {
         {MONEY.map(d => (
           <NavItem
             key={d.route}
+            testID={`nav-${d.route.toLowerCase()}`}
             label={t(
               `nav.${
                 d.route.toLowerCase() as 'expenses' | 'mileage' | 'reports'
@@ -199,6 +205,7 @@ export function AppDrawer({ state, navigation }: DrawerContentComponentProps) {
 
       <View style={[styles.footer, { paddingBottom: insets.bottom + 8 }]}>
         <NavItem
+          testID="nav-settings"
           label={t('nav.settings')}
           icon={Settings}
           active={current?.name === 'Settings'}

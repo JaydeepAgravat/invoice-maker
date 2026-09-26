@@ -18,6 +18,7 @@ import { mileageAmount } from '@/domain/mileage';
 import { QTY_SCALE } from '@/domain/money';
 import { NewButton } from '@/features/inbox/NewButton';
 import { useFormat } from '@/lib/format';
+import { EmptyMileage } from '@/ui/illustrations';
 import { ScreenHeader } from '@/ui/layout/ScreenHeader';
 import {
   Divider,
@@ -89,6 +90,7 @@ export function MileageScreen({ navigation }: DrawerProps<'Mileage'>) {
         left={
           width >= breakpoints.lg ? undefined : (
             <IconButton
+              testID="open-menu"
               icon={Menu}
               label={t('common.openMenu')}
               onPress={navigation.openDrawer}
@@ -98,6 +100,7 @@ export function MileageScreen({ navigation }: DrawerProps<'Mileage'>) {
       />
       {trips && trips.length === 0 ? (
         <EmptyState
+          illustration={<EmptyMileage />}
           title={t('mileage.emptyTitle')}
           body={t('mileage.emptyBody')}
         />

@@ -1,0 +1,33 @@
+# Acceptance (Phase 8): the main screens render in all five languages.
+appId: com.invoiceapp.dev
+name: 07_locales
+---
+- launchApp
+- extendedWaitUntil:
+    visible: "Documents"
+    timeout: 20000
+- runFlow:
+    file: subflows/locale.yaml
+    env: { CODE: es, THEME: Tema, SETTINGS: Ajustes, REPORTS: Informes, DOCUMENTS: Documentos, ESTIMATE: Presupuesto }
+- runFlow:
+    file: subflows/locale.yaml
+    env: { CODE: pt, THEME: Tema, SETTINGS: Ajustes, REPORTS: Relatórios, DOCUMENTS: Documentos, ESTIMATE: Orçamento }
+- runFlow:
+    file: subflows/locale.yaml
+    env: { CODE: fr, THEME: Thème, SETTINGS: Réglages, REPORTS: Rapports, DOCUMENTS: Documents, ESTIMATE: Devis }
+- runFlow:
+    file: subflows/locale.yaml
+    env: { CODE: de, THEME: Design, SETTINGS: Einstellungen, REPORTS: Berichte, DOCUMENTS: Dokumente, ESTIMATE: Angebot }
+- runFlow:
+    file: subflows/locale.yaml
+    env: { CODE: en, THEME: Theme, SETTINGS: Settings, REPORTS: Reports, DOCUMENTS: Documents, ESTIMATE: Estimate }
+# Back to following the phone's language for the flows that run after this one.
+- tapOn:
+    id: "open-menu"
+- tapOn:
+    id: "nav-settings"
+- scrollUntilVisible:
+    element:
+      id: "language-system"
+- tapOn:
+    id: "language-system"

@@ -97,7 +97,13 @@ export function PhotoStrip({ documentId }: { documentId: string }) {
           accessibilityLabel={t('photos.add')}
         >
           <Icon icon={ImagePlus} size={22} tone="accent" />
-          <Text variant="caption" tone="accent">
+          <Text
+            variant="caption"
+            tone="accent"
+            align="center"
+            numberOfLines={2}
+            maxFontSizeMultiplier={1.3}
+          >
             {t('photos.add')}
           </Text>
         </Touchable>
@@ -140,6 +146,7 @@ const styles = StyleSheet.create(theme => ({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 2,
+    paddingHorizontal: theme.space[1],
     borderWidth: theme.stroke.thin,
     borderStyle: 'dashed',
     borderColor: theme.colors.accent.border,

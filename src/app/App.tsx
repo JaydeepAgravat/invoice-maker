@@ -16,6 +16,7 @@ import { initBilling } from '@/billing/store';
 import { DatabaseGate } from '@/data/DatabaseGate';
 import { ProfileProvider } from '@/data/ProfileProvider';
 import { AppLock } from '@/features/lock/AppLock';
+import { initTelemetry } from '@/telemetry';
 import { ToastHost } from '@/ui/toast/ToastHost';
 
 import type { RootStackParamList } from './navigation';
@@ -33,6 +34,7 @@ const linking: LinkingOptions<RootStackParamList> = {
   },
 };
 
+initTelemetry();
 initBilling();
 
 export function App() {

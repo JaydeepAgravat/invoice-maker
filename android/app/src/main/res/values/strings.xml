@@ -1,6 +1,9 @@
 <resources>
-    <string name="app_name">InvoiceApp</string>
+    <string name="app_name">Invoice Maker</string>
     <string name="reminders_channel">Reminders</string>
     <string name="widget_label">Outstanding</string>
     <string name="widget_description">What clients still owe you, and a quick way to invoice</string>
+    <string name="widget_preview_amount">$4,250.00</string>
+    <string name="widget_preview_overdue">2 overdue</string>
+    <string name="widget_new">+  New invoice</string>
 </resources>

@@ -8,6 +8,7 @@ import en, { type Messages } from './locales/en';
 import es from './locales/es';
 import fr from './locales/fr';
 import pt from './locales/pt';
+import { pseudoTree } from './pseudo';
 
 export const SUPPORTED_LANGUAGES = ['en', 'es', 'pt', 'fr', 'de'] as const;
 export type Language = (typeof SUPPORTED_LANGUAGES)[number];
@@ -40,6 +41,7 @@ i18n.use(initReactI18next).init({
     pt: { translation: pt },
     fr: { translation: fr },
     de: { translation: de },
+    ...(__DEV__ ? { qps: { translation: pseudoTree(en as never) } } : {}),
   },
   lng: resolveLanguage(),
   fallbackLng: 'en',
@@ -55,6 +57,11 @@ export const setLanguage = (language: Language | null) => {
     prefs.remove(PrefKeys.language);
   }
   i18n.changeLanguage(resolveLanguage());
+};
+
+/** Development only: switch the UI to the pseudo-locale until the next restart. */
+export const setPseudoLocale = (on: boolean) => {
+  i18n.changeLanguage(on ? 'qps' : resolveLanguage());
 };
 
 declare module 'i18next' {

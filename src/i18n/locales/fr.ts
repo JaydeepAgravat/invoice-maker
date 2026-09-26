@@ -917,6 +917,12 @@ const fr: Messages = {
     nothingOverdue: 'Rien en retard',
   },
   settings: {
+    about: 'À propos',
+    support: 'Contacter l’assistance',
+    privacyPolicy: 'Politique de confidentialité',
+    terms: 'Conditions d’utilisation',
+    crashReports: 'Envoyer les rapports de plantage',
+    crashReportsHint: 'Anonymes. N’incluent jamais vos documents, clients ni montants.',
     homeScreen: 'Écran d’accueil',
     addWidget: 'Ajouter le widget',
     addWidgetHint: 'Ce qui reste à encaisser et « Nouvelle facture »',
@@ -936,7 +942,7 @@ const fr: Messages = {
     business: 'Entreprise',
     devPro: 'Fonctions Pro (test)',
     data: 'Données',
-    security: 'Sécurité',
+    security: 'Confidentialité et sécurité',
   },
 };
 

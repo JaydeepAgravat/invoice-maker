@@ -911,6 +911,12 @@ const en = {
     nothingOverdue: 'Nothing overdue',
   },
   settings: {
+    about: 'About',
+    support: 'Contact support',
+    privacyPolicy: 'Privacy policy',
+    terms: 'Terms of use',
+    crashReports: 'Send crash reports',
+    crashReportsHint: 'Anonymous. Never includes your documents, clients or amounts.',
     homeScreen: 'Home screen',
     addWidget: 'Add widget',
     addWidgetHint: 'What’s owed and a quick “New invoice”',
@@ -929,7 +935,7 @@ const en = {
     business: 'Business',
     devPro: 'Pro features (testing)',
     data: 'Data',
-    security: 'Security',
+    security: 'Privacy and security',
   },
 };
 

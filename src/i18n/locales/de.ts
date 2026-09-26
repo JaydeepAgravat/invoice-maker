@@ -915,6 +915,12 @@ const de: Messages = {
     nothingOverdue: 'Nichts überfällig',
   },
   settings: {
+    about: 'Über die App',
+    support: 'Support kontaktieren',
+    privacyPolicy: 'Datenschutzerklärung',
+    terms: 'Nutzungsbedingungen',
+    crashReports: 'Absturzberichte senden',
+    crashReportsHint: 'Anonym. Enthalten nie Ihre Dokumente, Kunden oder Beträge.',
     homeScreen: 'Startbildschirm',
     addWidget: 'Widget hinzufügen',
     addWidgetHint: 'Offene Beträge und schnell eine neue Rechnung',
@@ -933,7 +939,7 @@ const de: Messages = {
     business: 'Unternehmen',
     devPro: 'Pro-Funktionen (Test)',
     data: 'Daten',
-    security: 'Sicherheit',
+    security: 'Datenschutz und Sicherheit',
   },
 };
 

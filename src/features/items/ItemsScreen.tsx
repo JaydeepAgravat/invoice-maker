@@ -21,6 +21,7 @@ import { useProfile } from '@/data/ProfileProvider';
 import { clock, mutate, useLiveQuery } from '@/data/live';
 import { deleteItems, listItems, restoreItem } from '@/data/repositories/items';
 import { useFormat } from '@/lib/format';
+import { EmptyItems } from '@/ui/illustrations';
 import { ScreenHeader } from '@/ui/layout/ScreenHeader';
 import { SearchField } from '@/ui/layout/SearchField';
 import {
@@ -97,6 +98,7 @@ export function ItemsScreen({ navigation }: DrawerProps<'Items'>) {
             />
           ) : width >= breakpoints.lg ? undefined : (
             <IconButton
+              testID="open-menu"
               icon={Menu}
               label={t('common.openMenu')}
               onPress={navigation.openDrawer}
@@ -166,6 +168,7 @@ export function ItemsScreen({ navigation }: DrawerProps<'Items'>) {
               <EmptyState title={t('items.noMatches')} />
             ) : (
               <EmptyState
+                illustration={<EmptyItems />}
                 title={t('items.emptyTitle')}
                 body={t('items.emptyBody')}
                 action={{

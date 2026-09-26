@@ -18,6 +18,7 @@ import { ProTeaser } from '@/features/paywall/ProTeaser';
 import { renderReportHtml, type ReportLabels } from '@/pdf/reportHtml';
 import NativePdf from '@/specs/NativePdf';
 import NativeShare from '@/specs/NativeShare';
+import { EmptyReports } from '@/ui/illustrations';
 import { ScreenHeader } from '@/ui/layout/ScreenHeader';
 import {
   Chip,
@@ -184,6 +185,7 @@ export function ReportsScreen({ navigation }: DrawerProps<'Reports'>) {
         left={
           width >= breakpoints.lg ? undefined : (
             <IconButton
+              testID="open-menu"
               icon={Menu}
               label={t('common.openMenu')}
               onPress={navigation.openDrawer}
@@ -241,6 +243,7 @@ export function ReportsScreen({ navigation }: DrawerProps<'Reports'>) {
 
           {!r ? null : empty ? (
             <EmptyState
+              illustration={<EmptyReports />}
               title={t('reports.emptyTitle')}
               body={t('reports.emptyBody')}
             />

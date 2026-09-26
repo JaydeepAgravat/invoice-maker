@@ -68,6 +68,7 @@ export function SegmentedControl<T extends string>({
           <Pressable
             key={segment.value}
             style={styles.segment}
+            hitSlop={{ top: 6, bottom: 6 }}
             onPress={() => {
               if (!selected) {
                 haptics.play('selection');

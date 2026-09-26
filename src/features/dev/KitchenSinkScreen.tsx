@@ -12,7 +12,16 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
 import type { RootScreenProps } from '@/app/navigation';
-import { EmptyDocuments } from '@/ui/illustrations';
+import {
+  EmptyClients,
+  EmptyDocuments,
+  EmptyExpenses,
+  EmptyImport,
+  EmptyItems,
+  EmptyMileage,
+  EmptyPayments,
+  EmptyReports,
+} from '@/ui/illustrations';
 import { ScreenHeader } from '@/ui/layout/ScreenHeader';
 import {
   Avatar,
@@ -298,6 +307,19 @@ export function KitchenSinkScreen({
             action={{ label: 'New invoice', leadingIcon: Plus }}
           />
         </Surface>
+        <Surface style={[styles.card, styles.scenes]}>
+          {[
+            EmptyClients,
+            EmptyItems,
+            EmptyExpenses,
+            EmptyMileage,
+            EmptyPayments,
+            EmptyImport,
+            EmptyReports,
+          ].map((Scene, i) => (
+            <Scene key={i} size={100} />
+          ))}
+        </Surface>
       </ScrollView>
 
       <Sheet ref={sheet} title="Record payment">
@@ -322,6 +344,13 @@ export function KitchenSinkScreen({
 }
 
 const styles = StyleSheet.create(theme => ({
+  scenes: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: theme.space[4],
+    paddingVertical: theme.space[4],
+  },
   screen: {
     flex: 1,
     backgroundColor: theme.colors.bg.app,
