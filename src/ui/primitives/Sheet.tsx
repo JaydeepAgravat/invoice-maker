@@ -1,6 +1,7 @@
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
+  BottomSheetScrollView,
   BottomSheetView,
   type BottomSheetBackdropProps,
 } from '@gorhom/bottom-sheet';
@@ -19,14 +20,25 @@ import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
 import { Text } from './Text';
 
-export type SheetRef = BottomSheetModal;
+/**
+ * The handle screens get. Deliberately small: dismissing a sheet that was never
+ * presented puts @gorhom's modal into a stuck state where the next present()
+ * is ignored, so dismiss() here is a no-op unless the sheet is open.
+ */
+export type SheetRef = { present: () => void; dismiss: () => void };
 
 export type SheetProps = {
   title?: string;
+  /** Right side of the title row (e.g. a Done button). */
+  headerRight?: React.ReactNode;
   children: React.ReactNode;
   onDismiss?: () => void;
   /** Fixed snap points; omit to size to content. */
   snapPoints?: Array<string | number>;
+  /** Scrollable body for tall content (use with snapPoints). */
+  scrollable?: boolean;
+  /** Sticky footer below the body. */
+  footer?: React.ReactNode;
   ref?: Ref<SheetRef>;
 };
 
@@ -36,17 +48,35 @@ export type SheetProps = {
  */
 export function Sheet({
   title,
+  headerRight,
   children,
   onDismiss,
   snapPoints,
+  scrollable,
+  footer,
   ref,
 }: SheetProps) {
   const { theme } = useUnistyles();
   const insets = useSafeAreaInsets();
   const modal = useRef<BottomSheetModal>(null);
+  const isOpen = useRef(false);
   const [open, setOpen] = useState(false);
 
-  useImperativeHandle(ref, () => modal.current as BottomSheetModal, []);
+  useImperativeHandle(
+    ref,
+    () => ({
+      present: () => {
+        isOpen.current = true;
+        modal.current?.present();
+      },
+      dismiss: () => {
+        if (isOpen.current) {
+          modal.current?.dismiss();
+        }
+      },
+    }),
+    [],
+  );
 
   // Android back (including the predictive back gesture) closes the sheet
   // first instead of leaving the screen.
@@ -75,11 +105,26 @@ export function Sheet({
     [theme.colors.overlay.scrim],
   );
 
+  const header = title ? (
+    <View style={styles.header}>
+      <Text
+        variant="headline"
+        accessibilityRole="header"
+        style={styles.title}
+        numberOfLines={1}
+      >
+        {title}
+      </Text>
+      {headerRight}
+    </View>
+  ) : null;
+
   return (
     <BottomSheetModal
       ref={modal}
       onChange={index => setOpen(index >= 0)}
       onDismiss={() => {
+        isOpen.current = false;
         setOpen(false);
         onDismiss?.();
       }}
@@ -94,21 +139,38 @@ export function Sheet({
       overrideReduceMotion={ReduceMotion.System}
       accessibilityLabel={title}
     >
-      <BottomSheetView
-        style={[
-          styles.content,
-          { paddingBottom: insets.bottom + theme.space[4] },
-        ]}
-      >
-        {title ? (
-          <View style={styles.header}>
-            <Text variant="headline" accessibilityRole="header">
-              {title}
-            </Text>
-          </View>
-        ) : null}
-        {children}
-      </BottomSheetView>
+      {scrollable ? (
+        <>
+          <View style={styles.content}>{header}</View>
+          <BottomSheetScrollView
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={styles.scroll}
+          >
+            {children}
+          </BottomSheetScrollView>
+          {footer ? (
+            <View
+              style={[
+                styles.footer,
+                { paddingBottom: insets.bottom + theme.space[3] },
+              ]}
+            >
+              {footer}
+            </View>
+          ) : null}
+        </>
+      ) : (
+        <BottomSheetView
+          style={[
+            styles.content,
+            { paddingBottom: insets.bottom + theme.space[4] },
+          ]}
+        >
+          {header}
+          {children}
+          {footer ? <View style={styles.footerInline}>{footer}</View> : null}
+        </BottomSheetView>
+      )}
     </BottomSheetModal>
   );
 }
@@ -128,7 +190,32 @@ const styles = StyleSheet.create(theme => ({
     paddingTop: theme.space[1],
   },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.space[2],
+    minHeight: 40,
     paddingHorizontal: theme.size.gutter,
     paddingBottom: theme.space[3],
+  },
+  title: {
+    flex: 1,
+  },
+  scroll: {
+    paddingBottom: theme.space[4],
+  },
+  footer: {
+    flexDirection: 'row',
+    gap: theme.space[2],
+    paddingHorizontal: theme.size.gutter,
+    paddingTop: theme.space[3],
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: theme.colors.border.subtle,
+    backgroundColor: theme.colors.bg.elevated,
+  },
+  footerInline: {
+    flexDirection: 'row',
+    gap: theme.space[2],
+    paddingHorizontal: theme.size.gutter,
+    paddingTop: theme.space[4],
   },
 }));

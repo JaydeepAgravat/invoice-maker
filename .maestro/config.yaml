@@ -1,0 +1,7 @@
+# Flows run in this order; later flows rely on the business set up by the first.
+executionOrder:
+  continueOnFailure: false
+  flowsOrder:
+    - 01_onboarding_invoice_payment
+    - 02_estimate_change_order_invoice
+    - 03_inbox_swipe_undo_palette

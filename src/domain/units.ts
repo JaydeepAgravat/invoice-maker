@@ -5,8 +5,30 @@
 
 export type UnitSystem = 'METRIC' | 'IMPERIAL';
 
+export type UnitKey =
+  | 'item'
+  | 'unit'
+  | 'pc'
+  | 'project'
+  | 'hr'
+  | 'day'
+  | 'week'
+  | 'month'
+  | 'm'
+  | 'ft'
+  | 'm2'
+  | 'ft2'
+  | 'm3'
+  | 'yd3'
+  | 'l'
+  | 'gal'
+  | 'kg'
+  | 'lb'
+  | 'km'
+  | 'mi';
+
 export type UnitDef = {
-  key: string;
+  key: UnitKey;
   group:
     | 'COUNT'
     | 'TIME'

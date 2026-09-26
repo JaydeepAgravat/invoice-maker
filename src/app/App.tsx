@@ -12,6 +12,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
 import { DatabaseGate } from '@/data/DatabaseGate';
+import { ProfileProvider } from '@/data/ProfileProvider';
 import { ToastHost } from '@/ui/toast/ToastHost';
 
 import { RootNavigator } from './RootNavigator';
@@ -43,7 +44,9 @@ export function App() {
         <NavigationContainer theme={navigationTheme}>
           <BottomSheetModalProvider>
             <DatabaseGate>
-              <RootNavigator />
+              <ProfileProvider>
+                <RootNavigator />
+              </ProfileProvider>
             </DatabaseGate>
             <ToastHost />
           </BottomSheetModalProvider>

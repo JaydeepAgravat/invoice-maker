@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
 
-import { toast } from '@/ui/toast/store';
 import {
   Badge,
   Icon,
@@ -19,7 +18,7 @@ import { DOC_TYPES, type DocType } from './docTypes';
 
 type Props = {
   ref: RefObject<SheetRef | null>;
-  onSelect?: (type: DocType) => void;
+  onSelect: (type: DocType) => void;
 };
 
 /**
@@ -31,11 +30,7 @@ export function NewDocumentSheet({ ref, onSelect }: Props) {
 
   const pick = (type: DocType) => {
     ref.current?.dismiss();
-    if (onSelect) {
-      onSelect(type);
-    } else {
-      toast.show({ message: t('common.comingSoon') });
-    }
+    onSelect(type);
   };
 
   return (

@@ -1,0 +1,28 @@
+# Inbox gestures and search: swipe to mark paid, undo, command palette, sheet + back.
+appId: com.invoiceapp.dev
+name: 03_inbox_swipe_undo_palette
+---
+- launchApp
+- extendedWaitUntil:
+    visible: "Documents"
+    timeout: 20000
+- tapOn:
+    id: "new-document"
+- assertVisible: "Statement of account"
+- back
+- assertNotVisible: "Statement of account"
+
+- tapOn: "Unpaid"
+- swipe:
+    from:
+      id: "doc-INV-0001"
+    direction: RIGHT
+- assertVisible: "INV-0001 marked as paid"
+- tapOn: "Undo"
+- assertVisible: "Partially paid"
+
+- tapOn:
+    id: "open-search"
+- inputText: "bathroom"
+- assertVisible: "Acme Ltd"
+- back

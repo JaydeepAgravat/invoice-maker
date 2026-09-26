@@ -1,0 +1,96 @@
+# Acceptance (Phase 3): onboard → client → 3-line invoice → partial payment → Partially paid.
+appId: com.invoiceapp.dev
+name: 01_onboarding_invoice_payment
+---
+- launchApp:
+    clearState: true
+    permissions:
+      all: allow
+- extendedWaitUntil:
+    visible: "Where do you work?"
+    timeout: 30000
+- tapOn:
+    id: "country-GB"
+- tapOn:
+    id: "onboarding-continue"
+- tapOn:
+    id: "business-name"
+- inputText: "Smith Plumbing"
+- tapOn:
+    id: "onboarding-finish"
+
+# Editor: create the client inline.
+- extendedWaitUntil:
+    visible: "New invoice"
+    timeout: 10000
+- tapOn:
+    id: "editor-client"
+- inputText: "Acme Ltd"
+- tapOn:
+    id: "client-create-inline"
+- assertVisible: "Acme Ltd"
+
+# Line 1: Labour, 2 × 45.00 via keypad.
+- tapOn:
+    id: "add-line"
+- tapOn:
+    id: "line-name"
+- inputText: "Labour"
+- pressKey: Enter
+- tapOn: { id: "key-4" }
+- tapOn: { id: "key-5" }
+- tapOn: { id: "line-quantity" }
+- tapOn: { id: "key-back" }
+- tapOn: { id: "key-2" }
+- tapOn: { id: "line-save" }
+
+# Line 2: Copper pipe, 1.5 × 6.50 (decimal quantity).
+- tapOn:
+    id: "add-line"
+- tapOn:
+    id: "line-name"
+- inputText: "Copper pipe"
+- pressKey: Enter
+- tapOn: { id: "key-6" }
+- tapOn: { id: "key-dec" }
+- tapOn: { id: "key-5" }
+- tapOn: { id: "line-quantity" }
+- tapOn: { id: "key-dec" }
+- tapOn: { id: "key-5" }
+- tapOn: { id: "line-save" }
+
+# Line 3: Call-out fee, 30 × 1 using keypad arithmetic (20 + 10).
+- tapOn:
+    id: "add-line"
+- tapOn:
+    id: "line-name"
+- inputText: "Call-out fee"
+- pressKey: Enter
+- tapOn: { id: "key-2" }
+- tapOn: { id: "key-0" }
+- tapOn: { id: "key-plus" }
+- tapOn: { id: "key-1" }
+- tapOn: { id: "key-0" }
+- tapOn: { id: "line-save" }
+
+# 90.00 + 9.75 + 30.00 = 129.75, VAT 25.95 → 155.70
+- scrollUntilVisible:
+    element: "£155.70"
+- assertVisible: "£155.70"
+- tapOn:
+    id: "editor-issue"
+- extendedWaitUntil:
+    visible: "INV-0001"
+    timeout: 10000
+- assertVisible: "Sent"
+
+# Record a partial payment.
+- tapOn:
+    id: "detail-RECORD_PAYMENT"
+- tapOn: "Half"
+- tapOn:
+    id: "payment-save"
+- extendedWaitUntil:
+    visible: "Partially paid"
+    timeout: 10000
+- assertVisible: "£77.85"

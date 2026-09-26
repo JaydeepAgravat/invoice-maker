@@ -7,8 +7,18 @@ import { useTranslation } from 'react-i18next';
 import { useWindowDimensions } from 'react-native';
 import { useUnistyles } from 'react-native-unistyles';
 
+import { useProfile } from '@/data/ProfileProvider';
+import { ClientDetailScreen } from '@/features/clients/ClientDetailScreen';
+import { ClientEditorScreen } from '@/features/clients/ClientEditorScreen';
+import { ClientsScreen } from '@/features/clients/ClientsScreen';
 import { KitchenSinkScreen } from '@/features/dev/KitchenSinkScreen';
+import { DocumentDetailScreen } from '@/features/documents/DocumentDetailScreen';
+import { DocumentEditorScreen } from '@/features/editor/DocumentEditorScreen';
 import { InboxScreen } from '@/features/inbox/InboxScreen';
+import { ItemEditorScreen } from '@/features/items/ItemEditorScreen';
+import { ItemsScreen } from '@/features/items/ItemsScreen';
+import { OnboardingScreen } from '@/features/onboarding/OnboardingScreen';
+import { CommandPaletteScreen } from '@/features/palette/CommandPaletteScreen';
 import { PlaceholderScreen } from '@/features/placeholder/PlaceholderScreen';
 import { SettingsScreen } from '@/features/settings/SettingsScreen';
 import { breakpoints } from '@/ui/theme';
@@ -48,22 +58,8 @@ function MainDrawer() {
       }}
     >
       <Drawer.Screen name="Inbox" component={InboxScreen} />
-      <Drawer.Screen name="Clients">
-        {props => (
-          <PlaceholderScreen
-            title={t('nav.clients')}
-            navigation={props.navigation}
-          />
-        )}
-      </Drawer.Screen>
-      <Drawer.Screen name="Items">
-        {props => (
-          <PlaceholderScreen
-            title={t('nav.items')}
-            navigation={props.navigation}
-          />
-        )}
-      </Drawer.Screen>
+      <Drawer.Screen name="Clients" component={ClientsScreen} />
+      <Drawer.Screen name="Items" component={ItemsScreen} />
       <Drawer.Screen name="Expenses">
         {props => (
           <PlaceholderScreen
@@ -95,15 +91,48 @@ function MainDrawer() {
 
 export function RootNavigator() {
   const { theme } = useUnistyles();
+  const { onboarded } = useProfile();
   return (
     <Stack.Navigator
+      initialRouteName={onboarded ? 'Main' : 'Onboarding'}
       screenOptions={{
         headerShown: false,
         animation: 'default',
         contentStyle: { backgroundColor: theme.colors.bg.app },
       }}
     >
+      <Stack.Screen
+        name="Onboarding"
+        component={OnboardingScreen}
+        options={{ animation: 'fade' }}
+      />
       <Stack.Screen name="Main" component={MainDrawer} />
+      <Stack.Screen
+        name="DocumentEditor"
+        component={DocumentEditorScreen}
+        options={{ animation: 'slide_from_bottom' }}
+      />
+      <Stack.Screen name="DocumentDetail" component={DocumentDetailScreen} />
+      <Stack.Screen name="ClientDetail" component={ClientDetailScreen} />
+      <Stack.Screen
+        name="ClientEditor"
+        component={ClientEditorScreen}
+        options={{ animation: 'slide_from_bottom' }}
+      />
+      <Stack.Screen
+        name="ItemEditor"
+        component={ItemEditorScreen}
+        options={{ animation: 'slide_from_bottom' }}
+      />
+      <Stack.Screen
+        name="CommandPalette"
+        component={CommandPaletteScreen}
+        options={{
+          presentation: 'transparentModal',
+          animation: 'none',
+          contentStyle: { backgroundColor: 'transparent' },
+        }}
+      />
       {__DEV__ ? (
         <Stack.Screen name="KitchenSink" component={KitchenSinkScreen} />
       ) : null}

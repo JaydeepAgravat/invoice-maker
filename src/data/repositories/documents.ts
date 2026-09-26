@@ -1040,6 +1040,25 @@ export async function purgeDeleted(
   return r.rowsAffected;
 }
 
+/**
+ * Drafts with no client and no lines carry nothing worth keeping. They are
+ * normally removed when the editor closes; this catches the ones left behind
+ * when the app was killed mid-edit. Recent ones are kept (they may be open).
+ */
+export async function purgeEmptyDrafts(
+  db: Executor,
+  clock: Clock,
+  olderThanMs = 10 * 60_000,
+): Promise<number> {
+  const r = await db.execute(
+    `DELETE FROM documents WHERE status = 'DRAFT' AND client_id IS NULL AND deleted_at IS NULL AND updated_at < ?
+       AND NOT EXISTS (SELECT 1 FROM document_lines l WHERE l.document_id = documents.id)
+       AND NOT EXISTS (SELECT 1 FROM documents d2 WHERE d2.source_document_id = documents.id)`,
+    [clock.now() - olderThanMs],
+  );
+  return r.rowsAffected;
+}
+
 /* ───────────────────────────── Activity ──────────────────────────── */
 
 export type Activity = {

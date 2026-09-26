@@ -1,0 +1,69 @@
+# Acceptance (Phase 3): estimate → accepted → change order accepted → invoice with both.
+appId: com.invoiceapp.dev
+name: 02_estimate_change_order_invoice
+---
+- launchApp
+- extendedWaitUntil:
+    visible: "Documents"
+    timeout: 20000
+- tapOn:
+    id: "new-document"
+- tapOn: "Estimate"
+- tapOn:
+    id: "editor-client"
+- inputText: "Acme"
+- tapOn: "Acme Ltd"
+- tapOn:
+    id: "add-line"
+- tapOn:
+    id: "line-name"
+- inputText: "Bathroom refit"
+- pressKey: Enter
+- tapOn: { id: "key-1" }
+- tapOn: { id: "key-0" }
+- tapOn: { id: "key-0" }
+- tapOn: { id: "key-0" }
+- tapOn: { id: "line-save" }
+- tapOn:
+    id: "editor-issue"
+- extendedWaitUntil:
+    visible: "EST-0001"
+    timeout: 10000
+- tapOn:
+    id: "detail-ACCEPT"
+- assertVisible: "Accepted"
+
+# Change order.
+- tapOn:
+    id: "detail-more"
+- tapOn:
+    id: "action-CREATE_CHANGE_ORDER"
+- tapOn:
+    id: "add-line"
+- tapOn:
+    id: "line-name"
+- inputText: "Extra socket"
+- pressKey: Enter
+- tapOn: { id: "key-8" }
+- tapOn: { id: "key-0" }
+- tapOn: { id: "line-save" }
+- tapOn:
+    id: "editor-issue"
+- extendedWaitUntil:
+    visible: "CO-0001"
+    timeout: 10000
+- tapOn:
+    id: "detail-ACCEPT"
+- back
+
+# Convert the estimate: the invoice carries both the estimate and the accepted change.
+- extendedWaitUntil:
+    visible: "EST-0001"
+    timeout: 10000
+- assertVisible: "Revised total"
+- tapOn:
+    id: "detail-CONVERT_TO_INVOICE"
+- extendedWaitUntil:
+    visible: "Bathroom refit"
+    timeout: 10000
+- assertVisible: ".*socket"

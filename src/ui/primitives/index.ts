@@ -16,3 +16,5 @@ export * from './Text';
 export * from './TextField';
 export * from './Touchable';
 export * from './Chip';
+export * from './SwipeRow';
+export * from './ConfirmSheet';

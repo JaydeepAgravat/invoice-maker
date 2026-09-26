@@ -16,6 +16,7 @@ import {
   listActivity,
   listDerived,
   purgeDeleted,
+  purgeEmptyDrafts,
   recordPayment,
   restoreDocument,
   saveDocument,
@@ -671,5 +672,22 @@ describe('toFtsQuery', () => {
   it('quotes tokens as prefix matches', () => {
     expect(toFtsQuery('acme "INV-00')).toBe('"acme"* AND "INV"* AND "00"*');
     expect(toFtsQuery('***')).toBeNull();
+  });
+});
+
+describe('purgeEmptyDrafts', () => {
+  it('removes only old drafts with no client and no lines', async () => {
+    const empty = await createDraft(db, clock, 'INVOICE');
+    const withLine = await invoiceFor('Keep');
+    const client = await createClient(db, clock, { name: 'Also keep' });
+    const withClient = await createDraft(db, clock, 'INVOICE', {
+      clientId: client.id,
+    });
+    expect(await purgeEmptyDrafts(db, clock)).toBe(0); // too recent
+    clock.advanceDays(1);
+    expect(await purgeEmptyDrafts(db, clock)).toBe(1);
+    expect(await getDocument(db, empty.id)).toBeNull();
+    expect(await getDocument(db, withLine.doc.id)).not.toBeNull();
+    expect(await getDocument(db, withClient.id)).not.toBeNull();
   });
 });

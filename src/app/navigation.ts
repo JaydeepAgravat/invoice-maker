@@ -2,6 +2,8 @@ import type { DrawerScreenProps } from '@react-navigation/drawer';
 import type { NavigatorScreenParams } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
+import type { DocType } from '@/domain/docTypes';
+
 export type InboxView =
   | 'all'
   | 'drafts'
@@ -21,7 +23,14 @@ export type DrawerParamList = {
 };
 
 export type RootStackParamList = {
+  Onboarding: undefined;
   Main: NavigatorScreenParams<DrawerParamList> | undefined;
+  DocumentEditor: { id: string; isNew?: boolean };
+  DocumentDetail: { id: string };
+  ClientDetail: { id: string };
+  ClientEditor: { id?: string; name?: string } | undefined;
+  ItemEditor: { id?: string } | undefined;
+  CommandPalette: undefined;
   KitchenSink: undefined;
 };
 
@@ -31,6 +40,8 @@ export type DrawerProps<T extends keyof DrawerParamList> = DrawerScreenProps<
   DrawerParamList,
   T
 >;
+
+export type NewDocumentType = DocType;
 
 declare global {
   namespace ReactNavigation {
