@@ -10,4 +10,11 @@ export const PrefKeys = {
   themePreference: 'ui.theme',
   hapticsEnabled: 'ui.haptics',
   language: 'i18n.language',
+  lastBackupAt: 'backup.lastAt',
+  lastBackupKind: 'backup.lastKind',
+  lastBackupDocs: 'backup.lastDocs',
+  autoDriveBackup: 'backup.autoDrive',
+  driveError: 'backup.driveError',
+  nudgeDismissedAt: 'backup.nudgeDismissedAt',
+  overdueReminders: 'reminders.overdue',
 } as const;

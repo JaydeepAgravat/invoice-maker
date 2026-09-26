@@ -53,6 +53,7 @@ import { breakpoints } from '@/ui/theme';
 import { toast } from '@/ui/toast/store';
 
 import { DocumentRow } from './DocumentRow';
+import { BackupNudge } from './BackupNudge';
 import { NewButton } from './NewButton';
 
 const VIEWS: readonly InboxView[] = [
@@ -263,6 +264,7 @@ export function InboxScreen({ navigation, route }: DrawerProps<'Inbox'>) {
         contentContainerStyle={[styles.list, isEmpty && styles.listEmpty]}
         ListHeaderComponent={
           <View>
+            <BackupNudge />
             {summary ? (
               <View style={styles.summary}>
                 <Touchable

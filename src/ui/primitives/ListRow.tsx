@@ -63,7 +63,7 @@ export function ListRow({
           {title}
         </Text>
         {subtitle ? (
-          <Text variant="caption" tone="secondary" numberOfLines={1}>
+          <Text variant="caption" tone="secondary" numberOfLines={2}>
             {subtitle}
           </Text>
         ) : null}

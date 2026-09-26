@@ -5,9 +5,12 @@ import com.facebook.react.bridge.NativeModule
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.module.model.ReactModuleInfo
 import com.facebook.react.module.model.ReactModuleInfoProvider
+import com.invoiceapp.dev.backup.BackupModule
+import com.invoiceapp.dev.drive.DriveModule
 import com.invoiceapp.dev.haptics.HapticsModule
 import com.invoiceapp.dev.media.MediaModule
 import com.invoiceapp.dev.pdf.PdfModule
+import com.invoiceapp.dev.reminders.RemindersModule
 import com.invoiceapp.dev.share.ShareModule
 
 /** Registers the app's own Turbo Modules. */
@@ -19,11 +22,22 @@ class AppPackage : BaseReactPackage() {
       PdfModule.NAME -> PdfModule(reactContext)
       ShareModule.NAME -> ShareModule(reactContext)
       MediaModule.NAME -> MediaModule(reactContext)
+      BackupModule.NAME -> BackupModule(reactContext)
+      DriveModule.NAME -> DriveModule(reactContext)
+      RemindersModule.NAME -> RemindersModule(reactContext)
       else -> null
     }
 
   override fun getReactModuleInfoProvider() = ReactModuleInfoProvider {
-    listOf(HapticsModule.NAME, PdfModule.NAME, ShareModule.NAME, MediaModule.NAME)
+    listOf(
+      HapticsModule.NAME,
+      PdfModule.NAME,
+      ShareModule.NAME,
+      MediaModule.NAME,
+      BackupModule.NAME,
+      DriveModule.NAME,
+      RemindersModule.NAME,
+    )
       .associateWith { turboModuleInfo(it) }
   }
 

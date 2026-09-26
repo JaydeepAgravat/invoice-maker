@@ -1207,3 +1207,12 @@ export async function setAppearance(
     );
   }
 }
+
+/** Rebuild full-text search for every document (after a restore or import). */
+export async function rebuildSearchIndex(db: Executor): Promise<void> {
+  await db.execute('DELETE FROM documents_fts');
+  const { rows } = await db.execute('SELECT id FROM documents WHERE deleted_at IS NULL');
+  for (const r of rows) {
+    await indexForSearch(db, reqStr(r.id));
+  }
+}

@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.media.ExifInterface
 import android.net.Uri
+import android.provider.ContactsContract
 import android.provider.MediaStore
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -50,6 +51,13 @@ class MediaModule(context: ReactApplicationContext) :
     start(activity, intent, REQUEST_PICK, options, promise)
   }
 
+  override fun pickContact(promise: Promise) {
+    val activity = reactApplicationContext.currentActivity ?: return promise.reject("E_MEDIA", "No activity")
+    // Picking a phone row grants read access to just that row: no permission.
+    val intent = Intent(Intent.ACTION_PICK).setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE)
+    start(activity, intent, REQUEST_CONTACT, Arguments.createMap(), promise)
+  }
+
   override fun takePhoto(options: ReadableMap, promise: Promise) {
     val activity = reactApplicationContext.currentActivity ?: return promise.reject("E_MEDIA", "No activity")
     val dir = File(reactApplicationContext.cacheDir, "capture").apply { mkdirs() }
@@ -82,6 +90,10 @@ class MediaModule(context: ReactApplicationContext) :
       promise.resolve(null)
       return
     }
+    if (code == REQUEST_CONTACT) {
+      promise.resolve(data?.data?.let { readContact(it) })
+      return
+    }
     val source: Uri? = when (code) {
       REQUEST_PICK -> data?.data
       else -> captureFile?.let { Uri.fromFile(it) }
@@ -102,6 +114,27 @@ class MediaModule(context: ReactApplicationContext) :
   }
 
   override fun onNewIntent(intent: Intent) = Unit
+
+  private fun readContact(uri: Uri) = try {
+    reactApplicationContext.contentResolver.query(
+      uri,
+      arrayOf(
+        ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+        ContactsContract.CommonDataKinds.Phone.NUMBER,
+      ),
+      null,
+      null,
+      null,
+    )?.use { c ->
+      if (!c.moveToFirst()) null
+      else Arguments.createMap().apply {
+        putString("name", c.getString(0) ?: "")
+        putString("phone", c.getString(1))
+      }
+    }
+  } catch (_: Exception) {
+    null
+  }
 
   private fun process(source: Uri, options: ReadableMap) = run {
     val resolver = reactApplicationContext.contentResolver
@@ -211,5 +244,6 @@ class MediaModule(context: ReactApplicationContext) :
     const val NAME = "NativeMedia"
     private const val REQUEST_PICK = 4811
     private const val REQUEST_CAPTURE = 4812
+    private const val REQUEST_CONTACT = 4813
   }
 }

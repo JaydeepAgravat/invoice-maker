@@ -3,6 +3,7 @@ import {
   DarkTheme,
   DefaultTheme,
   NavigationContainer,
+  type LinkingOptions,
   type Theme as NavigationTheme,
 } from '@react-navigation/native';
 import { useMemo } from 'react';
@@ -15,7 +16,19 @@ import { DatabaseGate } from '@/data/DatabaseGate';
 import { ProfileProvider } from '@/data/ProfileProvider';
 import { ToastHost } from '@/ui/toast/ToastHost';
 
+import type { RootStackParamList } from './navigation';
 import { RootNavigator } from './RootNavigator';
+
+/** Links from reminder notifications. */
+const linking: LinkingOptions<RootStackParamList> = {
+  prefixes: ['invoiceapp://'],
+  config: {
+    screens: {
+      DocumentDetail: 'document/:id',
+      Main: { screens: { Inbox: 'inbox/:view' } },
+    },
+  },
+};
 
 export function App() {
   const { theme } = useUnistyles();
@@ -41,7 +54,7 @@ export function App() {
     <GestureHandlerRootView style={styles.root}>
       <SafeAreaProvider>
         <SystemBars style={theme.dark ? 'light' : 'dark'} />
-        <NavigationContainer theme={navigationTheme}>
+        <NavigationContainer theme={navigationTheme} linking={linking}>
           <BottomSheetModalProvider>
             <DatabaseGate>
               <ProfileProvider>

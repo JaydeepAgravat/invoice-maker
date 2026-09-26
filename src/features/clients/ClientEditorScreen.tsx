@@ -1,5 +1,5 @@
 import { usePreventRemove } from '@react-navigation/native';
-import { Plus, Trash2, X } from 'lucide-react-native';
+import { Contact, Plus, Trash2, X } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, ScrollView, View } from 'react-native';
@@ -21,6 +21,7 @@ import { SUPPORTED_LANGUAGES } from '@/i18n';
 import { CurrencySheet } from '@/features/editor/CurrencySheet';
 import { LANGUAGE_NAMES } from '@/features/onboarding/OnboardingScreen';
 import { useFormat } from '@/lib/format';
+import NativeMedia from '@/specs/NativeMedia';
 import { ScreenHeader } from '@/ui/layout/ScreenHeader';
 import {
   Button,
@@ -52,6 +53,7 @@ export function ClientEditorScreen({
   const [form, setForm] = useState<ClientInput>({
     ...EMPTY,
     name: route.params?.name ?? '',
+    phone: route.params?.phone ?? null,
   });
   const [dirty, setDirty] = useState(false);
   const [showShipping, setShowShipping] = useState(false);
@@ -162,6 +164,29 @@ export function ClientEditorScreen({
             autoCapitalize="words"
           />
         </View>
+
+        {!id ? (
+          <View style={styles.contacts}>
+            <Button
+              testID="client-from-contacts"
+              variant="ghost"
+              size="sm"
+              leadingIcon={Contact}
+              label={t('import.fromContacts')}
+              onPress={async () => {
+                const c = await NativeMedia?.pickContact().catch(() => null);
+                if (c) {
+                  setForm(prev => ({
+                    ...prev,
+                    name: c.name || prev.name,
+                    phone: c.phone ?? prev.phone,
+                  }));
+                  setDirty(true);
+                }
+              }}
+            />
+          </View>
+        ) : null}
 
         <Surface style={styles.card}>
           <ListRow
@@ -414,6 +439,12 @@ const styles = StyleSheet.create(theme => ({
   },
   card: {
     marginHorizontal: theme.size.gutter,
+  },
+  contacts: {
+    alignItems: 'flex-start',
+    paddingHorizontal: theme.size.gutter - theme.space[3],
+    marginTop: -theme.space[3],
+    marginBottom: theme.space[3],
   },
   top: {
     marginTop: theme.space[4],

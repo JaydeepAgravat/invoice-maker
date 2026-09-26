@@ -45,6 +45,7 @@ import {
   type DocumentRecord,
 } from '@/data/repositories/documents';
 import { getClientSignature } from '@/data/repositories/attachments';
+import { getSchedule, type Schedule } from '@/data/repositories/recurring';
 import { contractValue } from '@/domain/changeOrder';
 import { allowedActions } from '@/domain/status';
 import { useFormat } from '@/lib/format';
@@ -67,6 +68,8 @@ import { toast } from '@/ui/toast/store';
 
 import { DocumentThumbnail } from '../preview/DocumentThumbnail';
 import { SignatureImage } from '../signature/SignatureImage';
+
+import { RecurringSheet } from './RecurringSheet';
 import { ShareSheet, type ShareSheetRef } from '../share/ShareSheet';
 
 import { RecordPaymentSheet, type PaymentInput } from './RecordPaymentSheet';
@@ -85,6 +88,7 @@ type Loaded = {
   source: DocumentRecord | null;
   activity: Awaited<ReturnType<typeof listActivity>>;
   signature: Awaited<ReturnType<typeof getClientSignature>>;
+  schedule: Schedule | null;
 };
 
 const ACTION_ICONS: Record<UiAction, LucideIcon> = {
@@ -122,6 +126,7 @@ export function DocumentDetailScreen({
   const moreSheet = useRef<SheetRef>(null);
   const voidSheet = useRef<SheetRef>(null);
   const shareSheet = useRef<ShareSheetRef>(null);
+  const recurringSheet = useRef<SheetRef>(null);
   const [, force] = useState(0);
 
   const { data } = useLiveQuery<Loaded | null>(
@@ -138,6 +143,7 @@ export function DocumentDetailScreen({
           : null,
         activity: await listActivity(db, id),
         signature: await getClientSignature(db, id),
+        schedule: await getSchedule(db, id),
       };
     },
     [id],
@@ -151,7 +157,7 @@ export function DocumentDetailScreen({
   if (!data) {
     return <View style={styles.screen} />;
   }
-  const { doc, derived, source, activity, signature } = data;
+  const { doc, derived, source, activity, signature, schedule } = data;
   const status = statusOf(doc, today);
   const signable =
     (doc.type === 'ESTIMATE' ||
@@ -378,6 +384,25 @@ export function DocumentDetailScreen({
               />
             </>
           ) : null}
+          {doc.type === 'INVOICE' && doc.number && status !== 'VOID' ? (
+            <>
+              <Divider inset={16} />
+              <ListRow
+                testID="detail-repeat"
+                title={t('recurring.title')}
+                value={
+                  schedule?.active
+                    ? t('recurring.summary', {
+                        freq: t(`recurring.freq.${schedule.frequency}`),
+                        date: f.date(schedule.nextDate, 'short'),
+                      })
+                    : t('recurring.off')
+                }
+                showChevron
+                onPress={() => recurringSheet.current?.present()}
+              />
+            </>
+          ) : null}
         </Surface>
 
         {contract ? (
@@ -601,6 +626,12 @@ export function DocumentDetailScreen({
       ) : null}
 
       <ShareSheet ref={shareSheet} />
+      <RecurringSheet
+        ref={recurringSheet}
+        documentId={id}
+        issueDate={doc.issueDate}
+        schedule={schedule}
+      />
 
       <RecordPaymentSheet
         ref={paymentSheet}

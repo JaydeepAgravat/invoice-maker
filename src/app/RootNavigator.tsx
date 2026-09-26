@@ -25,6 +25,8 @@ import { MileageScreen } from '@/features/mileage/MileageScreen';
 import { TripEditorScreen } from '@/features/mileage/TripEditorScreen';
 import { ReportsScreen } from '@/features/reports/ReportsScreen';
 import { SignatureScreen } from '@/features/signature/SignatureScreen';
+import { BackupScreen } from '@/features/backup/BackupScreen';
+import { ImportScreen } from '@/features/backup/ImportScreen';
 import { BusinessProfileScreen } from '@/features/settings/BusinessProfileScreen';
 import { PaymentMethodEditorScreen } from '@/features/settings/PaymentMethodEditorScreen';
 import { PaymentMethodsScreen } from '@/features/settings/PaymentMethodsScreen';
@@ -32,6 +34,7 @@ import { SettingsScreen } from '@/features/settings/SettingsScreen';
 import { breakpoints } from '@/ui/theme';
 
 import { AppDrawer } from './AppDrawer';
+import { useAppLifecycle } from './useAppLifecycle';
 import type { DrawerParamList, RootStackParamList } from './navigation';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -78,6 +81,7 @@ function MainDrawer() {
 export function RootNavigator() {
   const { theme } = useUnistyles();
   const { onboarded } = useProfile();
+  useAppLifecycle(onboarded);
   return (
     <Stack.Navigator
       initialRouteName={onboarded ? 'Main' : 'Onboarding'}
@@ -117,6 +121,12 @@ export function RootNavigator() {
         options={{ animation: 'slide_from_bottom' }}
       />
       <Stack.Screen name="PaymentMethods" component={PaymentMethodsScreen} />
+      <Stack.Screen name="Backup" component={BackupScreen} />
+      <Stack.Screen
+        name="Import"
+        component={ImportScreen}
+        options={{ animation: 'slide_from_bottom' }}
+      />
       <Stack.Screen
         name="ExpenseEditor"
         component={ExpenseEditorScreen}

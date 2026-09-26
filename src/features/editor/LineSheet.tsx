@@ -1,6 +1,12 @@
 import { BottomSheetTextInput } from '@gorhom/bottom-sheet';
 import { Check, Package, Trash2 } from 'lucide-react-native';
-import { useEffect, useMemo, useState, type Ref } from 'react';
+import {
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useState,
+  type Ref,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { unitLabel } from '@/features/documents/statusMeta';
@@ -89,6 +95,7 @@ export function LineSheet({
   const [active, setActive] = useState<Field | null>(null);
   const [expr, setExpr] = useState('');
   const [nameFocused, setNameFocused] = useState(false);
+  const [textKey, setTextKey] = useState(0);
   const isNew = !line;
 
   useEffect(() => {
@@ -96,15 +103,18 @@ export function LineSheet({
     setActive(null);
     setExpr('');
     setNameFocused(false);
+    setTextKey(k => k + 1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resetKey]);
 
+  // Typing never waits for the catalog search: it runs on a deferred copy.
+  const searchName = useDeferredValue(draft.name);
   const { data: catalog } = useLiveQuery(
     db =>
       nameFocused && !draft.itemId
-        ? listItems(db, { search: draft.name, limit: 6 })
+        ? listItems(db, { search: searchName, limit: 6 })
         : Promise.resolve([] as Item[]),
-    [nameFocused, draft.name, draft.itemId],
+    [nameFocused, searchName, draft.itemId],
   );
   const { data: rates } = useLiveQuery(db => listTaxRates(db), []);
 
@@ -188,6 +198,7 @@ export function LineSheet({
       unitPrice: item.unitPrice,
       taxes: item.taxRateIds.length ? snap : d.taxes,
     }));
+    setTextKey(k => k + 1);
     Keyboard.dismiss();
     setNameFocused(false);
     activate('quantity');
@@ -310,9 +321,12 @@ export function LineSheet({
       }
     >
       <View style={styles.pad}>
+        {/* Uncontrolled: the native field owns the text so fast typing never
+            drops characters; it remounts only when the text is set for it. */}
         <BottomSheetTextInput
+          key={`name-${textKey}`}
           testID="line-name"
-          value={draft.name}
+          defaultValue={draft.name}
           onChangeText={name =>
             setDraft(d => ({
               ...d,
@@ -335,7 +349,8 @@ export function LineSheet({
           accessibilityLabel={t('line.name')}
         />
         <BottomSheetTextInput
-          value={draft.description ?? ''}
+          key={`desc-${textKey}`}
+          defaultValue={draft.description ?? ''}
           onChangeText={description => setDraft(d => ({ ...d, description }))}
           onFocus={() => setActive(null)}
           placeholder={t('line.descriptionPlaceholder')}

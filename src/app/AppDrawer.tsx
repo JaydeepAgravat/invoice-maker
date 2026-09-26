@@ -103,6 +103,11 @@ export function AppDrawer({ state, navigation }: DrawerContentComponentProps) {
   const { profile } = useProfile();
   const businessName = profile.name || t('business.title');
   const current = state.routes[state.index];
+  // Choosing the screen you're already on still closes the drawer.
+  const go = (navigate: () => void) => {
+    navigate();
+    navigation.closeDrawer();
+  };
   const currentView =
     current?.name === 'Inbox'
       ? (current.params as DrawerParamList['Inbox'])?.view ?? 'all'
@@ -157,7 +162,7 @@ export function AppDrawer({ state, navigation }: DrawerContentComponentProps) {
             icon={v.icon}
             tone={v.tone}
             active={currentView === v.view}
-            onPress={() => navigation.navigate('Inbox', { view: v.view })}
+            onPress={() => go(() => navigation.navigate('Inbox', { view: v.view }))}
           />
         ))}
 
@@ -170,7 +175,7 @@ export function AppDrawer({ state, navigation }: DrawerContentComponentProps) {
             label={t(`nav.${d.route.toLowerCase() as 'clients' | 'items'}`)}
             icon={d.icon}
             active={current?.name === d.route}
-            onPress={() => navigation.navigate(d.route)}
+            onPress={() => go(() => navigation.navigate(d.route))}
           />
         ))}
 
@@ -187,7 +192,7 @@ export function AppDrawer({ state, navigation }: DrawerContentComponentProps) {
             )}
             icon={d.icon}
             active={current?.name === d.route}
-            onPress={() => navigation.navigate(d.route)}
+            onPress={() => go(() => navigation.navigate(d.route))}
           />
         ))}
       </ScrollView>
@@ -197,7 +202,7 @@ export function AppDrawer({ state, navigation }: DrawerContentComponentProps) {
           label={t('nav.settings')}
           icon={Settings}
           active={current?.name === 'Settings'}
-          onPress={() => navigation.navigate('Settings')}
+          onPress={() => go(() => navigation.navigate('Settings'))}
         />
       </View>
     </View>

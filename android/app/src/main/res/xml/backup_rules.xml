@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 11 and older: back up the database and private files, not caches. -->
+<full-backup-content>
+  <include domain="database" path="." />
+  <include domain="file" path="." />
+  <exclude domain="sharedpref" path="reminders.xml" />
+</full-backup-content>

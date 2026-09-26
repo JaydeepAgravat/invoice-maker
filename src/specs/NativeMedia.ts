@@ -12,7 +12,11 @@ export type MediaOptions = {
   folder: string;
 };
 
+export type PickedContact = { name: string; phone: string | null };
+
 export interface Spec extends TurboModule {
+  /** System contact picker (phone numbers); no contacts permission needed. */
+  pickContact(): Promise<PickedContact | null>;
   /** System photo picker; resolves null when cancelled. No permission needed. */
   pickImage(options: MediaOptions): Promise<MediaFile | null>;
   /** Camera app capture; resolves null when cancelled. No permission needed. */

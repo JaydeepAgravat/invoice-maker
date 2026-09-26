@@ -1,4 +1,4 @@
-import { Database as DatabaseIcon, Trash2 } from 'lucide-react-native';
+import { Bell, Database as DatabaseIcon, Trash2 } from 'lucide-react-native';
 import { useCallback, useEffect, useState } from 'react';
 import { View } from 'react-native';
 
@@ -12,6 +12,7 @@ import {
 import { seedSampleData } from '@/data/seed';
 import { presetForLocale } from '@/domain/presets';
 import { deviceLocale, resolveLanguage } from '@/i18n';
+import NativeReminders from '@/specs/NativeReminders';
 import { Divider, ListRow } from '@/ui/primitives';
 import { toast } from '@/ui/toast/store';
 
@@ -108,6 +109,24 @@ export function DevDataTools() {
         title={busy ? 'Seeding…' : 'Load 1,000 sample documents'}
         leadingIcon={DatabaseIcon}
         onPress={busy ? undefined : seed}
+      />
+      <Divider inset={52} />
+      <ListRow
+        testID="dev-test-reminder"
+        title="Test reminder in 5 seconds"
+        subtitle="Opens the Overdue view when tapped"
+        leadingIcon={Bell}
+        onPress={() =>
+          NativeReminders?.setAll([
+            {
+              id: 'dev-test',
+              at: Date.now() + 5000,
+              title: 'INV-0001 is overdue',
+              body: '£77.85 from Acme Ltd was due yesterday.',
+              url: 'invoiceapp://inbox/overdue',
+            },
+          ])
+        }
       />
       <Divider inset={52} />
       <ListRow

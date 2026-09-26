@@ -1,12 +1,14 @@
-import { useNavigation } from '@react-navigation/native';
-import { Building2, Check, CreditCard, Crown, LayoutGrid, Menu } from 'lucide-react-native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { Bell, Building2, Check, CloudUpload, CreditCard, Crown, LayoutGrid, Menu } from 'lucide-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, View, useWindowDimensions } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
 
 import type { DrawerProps } from '@/app/navigation';
+import { lastBackup } from '@/backup/service';
 import { setPro, useIsPro } from '@/billing/entitlement';
+import { ensureNotificationPermission } from '@/features/documents/RecurringSheet';
 import { useLiveQuery } from '@/data/live';
 import { useProfile } from '@/data/ProfileProvider';
 import { listPaymentMethods } from '@/data/repositories/paymentMethods';
@@ -54,6 +56,19 @@ export function SettingsScreen({ navigation }: DrawerProps<'Settings'>) {
 
   const { profile } = useProfile();
   const pro = useIsPro();
+  const [overdue, setOverdue] = useState(
+    prefs.getBoolean(PrefKeys.overdueReminders) ?? false,
+  );
+  // Re-read when returning from the Backup screen.
+  useIsFocused();
+  const backup = lastBackup();
+  const toggleOverdue = async (next: boolean) => {
+    if (next && !(await ensureNotificationPermission())) {
+      return;
+    }
+    prefs.set(PrefKeys.overdueReminders, next);
+    setOverdue(next);
+  };
   const { data: methods } = useLiveQuery(db => listPaymentMethods(db), []);
 
   const chooseLanguage = (next: Language | null) => {
@@ -99,6 +114,42 @@ export function SettingsScreen({ navigation }: DrawerProps<'Settings'>) {
             }
             showChevron
             onPress={() => root.navigate('PaymentMethods')}
+          />
+        </Surface>
+
+        <SectionHeader title={t('settings.data')} />
+        <Surface style={styles.card}>
+          <ListRow
+            testID="settings-backup"
+            leadingIcon={CloudUpload}
+            title={t('backup.title')}
+            subtitle={
+              backup
+                ? t('backup.lastShort', {
+                    date: new Intl.DateTimeFormat(profile.locale, {
+                      day: 'numeric',
+                      month: 'short',
+                    }).format(backup.at),
+                  })
+                : t('backup.never')
+            }
+            showChevron
+            onPress={() => root.navigate('Backup')}
+          />
+          <Divider inset={52} />
+          <ListRow
+            testID="settings-overdue"
+            leadingIcon={Bell}
+            title={t('reminders.overdueSetting')}
+            subtitle={t('reminders.overdueSettingHint')}
+            onPress={() => toggleOverdue(!overdue)}
+            trailing={
+              <Switch
+                value={overdue}
+                onValueChange={toggleOverdue}
+                accessibilityLabel={t('reminders.overdueSetting')}
+              />
+            }
           />
         </Surface>
 

@@ -1,0 +1,34 @@
+# Acceptance (Phase 6): save a backup file, restore it (add missing), repeat an invoice monthly.
+appId: com.invoiceapp.dev
+name: 06_backup_recurring
+---
+- launchApp
+- extendedWaitUntil:
+    visible: "Documents"
+    timeout: 20000
+
+- tapOn: "Open menu"
+- tapOn: "Settings"
+- tapOn:
+    id: "settings-backup"
+- assertVisible: "Not backed up yet"
+- tapOn:
+    id: "backup-save"
+- extendedWaitUntil:
+    visible: "Saved to Downloads.*"
+    timeout: 15000
+- assertVisible: "Your data is backed up"
+- back
+- back
+
+# Repeat the invoice monthly.
+- tapOn: "Open menu"
+- tapOn: "All"
+- tapOn: ".*INV-0001.*"
+- tapOn:
+    id: "detail-repeat"
+- tapOn:
+    id: "recurring-save"
+- extendedWaitUntil:
+    visible: "Monthly · next.*"
+    timeout: 10000

@@ -2,6 +2,7 @@ import type { Database } from '../db/types';
 
 import { migration001 } from './001_initial';
 import { migration002 } from './002_money';
+import { migration003 } from './003_recurring';
 
 export type Migration = {
   version: number;
@@ -13,6 +14,7 @@ export type Migration = {
 export const MIGRATIONS: readonly Migration[] = [
   { version: 1, name: 'initial', statements: migration001 },
   { version: 2, name: 'money', statements: migration002 },
+  { version: 3, name: 'recurring', statements: migration003 },
 ];
 
 export const LATEST_VERSION = MIGRATIONS[MIGRATIONS.length - 1]!.version;

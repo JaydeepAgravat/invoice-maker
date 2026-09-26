@@ -31,11 +31,23 @@ const subscribe = (l: () => void) => {
 };
 
 // Coming back to the app may cross midnight: re-derive "Overdue" and friends.
+// Going to the background, fold the write-ahead log into the database file so
+// Android's own backup always copies a complete database.
 AppState.addEventListener('change', state => {
   if (state === 'active') {
     bump();
+  } else if (state === 'background') {
+    getDatabase()
+      .then(db => db.execute('PRAGMA wal_checkpoint(TRUNCATE)'))
+      .catch(() => undefined);
   }
 });
+
+/** Tell every live query to refresh (after a restore or bulk import). */
+export const notifyDataChanged = () => bump();
+
+/** Subscribe to data changes outside React (reminder scheduling). */
+export const onDataChanged = subscribe;
 
 export const useDataVersion = () =>
   useSyncExternalStore(subscribe, () => version);

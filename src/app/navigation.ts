@@ -29,10 +29,12 @@ export type RootStackParamList = {
   DocumentDetail: { id: string };
   DocumentPreview: { id: string };
   ClientDetail: { id: string };
-  ClientEditor: { id?: string; name?: string } | undefined;
+  ClientEditor: { id?: string; name?: string; phone?: string } | undefined;
   ItemEditor: { id?: string } | undefined;
   CommandPalette: undefined;
   BusinessProfile: undefined;
+  Backup: undefined;
+  Import: { target: 'clients' | 'items' };
   ExpenseEditor: { id?: string } | undefined;
   TripEditor: { id?: string } | undefined;
   Signature: { documentId?: string };
