@@ -1,0 +1,4 @@
+<resources>
+    <!-- Must match src/ui/tokens/colors.ts (bg.app) so there is no flash on cold start. -->
+    <color name="window_background">#FCFCFD</color>
+</resources>
