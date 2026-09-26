@@ -3,7 +3,13 @@ import { StyleSheet } from 'react-native-unistyles';
 
 import { Text } from './Text';
 
-export type BadgeTone = 'neutral' | 'info' | 'success' | 'warning' | 'danger' | 'accent';
+export type BadgeTone =
+  | 'neutral'
+  | 'info'
+  | 'success'
+  | 'warning'
+  | 'danger'
+  | 'accent';
 
 /**
  * Status pill with a leading dot. Color is never the only signal: the label

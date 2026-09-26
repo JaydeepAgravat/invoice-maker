@@ -1,5 +1,8 @@
 import { View } from 'react-native';
-import Animated, { useAnimatedStyle, type SharedValue } from 'react-native-reanimated';
+import Animated, {
+  useAnimatedStyle,
+  type SharedValue,
+} from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StyleSheet } from 'react-native-unistyles';
 
@@ -13,7 +16,12 @@ export type ScreenHeaderProps = {
   scrollY?: SharedValue<number>;
 };
 
-export function ScreenHeader({ title, left, right, scrollY }: ScreenHeaderProps) {
+export function ScreenHeader({
+  title,
+  left,
+  right,
+  scrollY,
+}: ScreenHeaderProps) {
   const insets = useSafeAreaInsets();
 
   const hairline = useAnimatedStyle(() => ({
@@ -24,7 +32,12 @@ export function ScreenHeader({ title, left, right, scrollY }: ScreenHeaderProps)
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.bar}>
         <View style={styles.side}>{left}</View>
-        <Text variant="headline" numberOfLines={1} style={styles.title} accessibilityRole="header">
+        <Text
+          variant="headline"
+          numberOfLines={1}
+          style={styles.title}
+          accessibilityRole="header"
+        >
           {title}
         </Text>
         <View style={[styles.side, styles.right]}>{right}</View>

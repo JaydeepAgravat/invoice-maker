@@ -19,7 +19,9 @@ import type { DrawerParamList, RootStackParamList } from './navigation';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator<DrawerParamList>();
 
-const renderDrawer = (props: DrawerContentComponentProps) => <AppDrawer {...props} />;
+const renderDrawer = (props: DrawerContentComponentProps) => (
+  <AppDrawer {...props} />
+);
 
 function MainDrawer() {
   const { t } = useTranslation();
@@ -47,19 +49,44 @@ function MainDrawer() {
     >
       <Drawer.Screen name="Inbox" component={InboxScreen} />
       <Drawer.Screen name="Clients">
-        {props => <PlaceholderScreen title={t('nav.clients')} navigation={props.navigation} />}
+        {props => (
+          <PlaceholderScreen
+            title={t('nav.clients')}
+            navigation={props.navigation}
+          />
+        )}
       </Drawer.Screen>
       <Drawer.Screen name="Items">
-        {props => <PlaceholderScreen title={t('nav.items')} navigation={props.navigation} />}
+        {props => (
+          <PlaceholderScreen
+            title={t('nav.items')}
+            navigation={props.navigation}
+          />
+        )}
       </Drawer.Screen>
       <Drawer.Screen name="Expenses">
-        {props => <PlaceholderScreen title={t('nav.expenses')} navigation={props.navigation} />}
+        {props => (
+          <PlaceholderScreen
+            title={t('nav.expenses')}
+            navigation={props.navigation}
+          />
+        )}
       </Drawer.Screen>
       <Drawer.Screen name="Mileage">
-        {props => <PlaceholderScreen title={t('nav.mileage')} navigation={props.navigation} />}
+        {props => (
+          <PlaceholderScreen
+            title={t('nav.mileage')}
+            navigation={props.navigation}
+          />
+        )}
       </Drawer.Screen>
       <Drawer.Screen name="Reports">
-        {props => <PlaceholderScreen title={t('nav.reports')} navigation={props.navigation} />}
+        {props => (
+          <PlaceholderScreen
+            title={t('nav.reports')}
+            navigation={props.navigation}
+          />
+        )}
       </Drawer.Screen>
       <Drawer.Screen name="Settings" component={SettingsScreen} />
     </Drawer.Navigator>
@@ -77,7 +104,9 @@ export function RootNavigator() {
       }}
     >
       <Stack.Screen name="Main" component={MainDrawer} />
-      {__DEV__ ? <Stack.Screen name="KitchenSink" component={KitchenSinkScreen} /> : null}
+      {__DEV__ ? (
+        <Stack.Screen name="KitchenSink" component={KitchenSinkScreen} />
+      ) : null}
     </Stack.Navigator>
   );
 }

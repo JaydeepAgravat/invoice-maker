@@ -55,33 +55,56 @@ export function ToastHost() {
       style={[styles.host, { bottom: insets.bottom + BOTTOM_OFFSET }]}
     >
       <GestureDetector gesture={pan}>
+        {/* Layout animations and the drag transform live on separate views so
+            Reanimated never has two owners for the same property. */}
         <Animated.View
           key={current.id}
           entering={SlideInDown.springify().damping(30).stiffness(320)}
           exiting={FadeOut.duration(150)}
-          style={[styles.toast, dragStyle]}
-          accessibilityRole="alert"
+          style={styles.slot}
         >
-          {current.tone === 'success' && <Icon icon={CircleCheck} size={18} color={theme.colors.status.success.solid} />}
-          {current.tone === 'danger' && <Icon icon={CircleAlert} size={18} color={theme.colors.status.danger.solid} />}
-          <Text variant="calloutMedium" tone="inverse" style={styles.message} numberOfLines={2}>
-            {current.message}
-          </Text>
-          {current.action ? (
-            <Pressable
-              hitSlop={12}
-              accessibilityRole="button"
-              onPress={() => {
-                current.action?.onPress();
-                dismiss(current.id);
-              }}
-              style={styles.action}
+          <Animated.View
+            style={[styles.toast, dragStyle]}
+            accessibilityRole="alert"
+          >
+            {current.tone === 'success' && (
+              <Icon
+                icon={CircleCheck}
+                size={18}
+                color={theme.colors.status.success.solid}
+              />
+            )}
+            {current.tone === 'danger' && (
+              <Icon
+                icon={CircleAlert}
+                size={18}
+                color={theme.colors.status.danger.solid}
+              />
+            )}
+            <Text
+              variant="calloutMedium"
+              tone="inverse"
+              style={styles.message}
+              numberOfLines={2}
             >
-              <Text variant="calloutMedium" style={styles.actionLabel}>
-                {current.action.label}
-              </Text>
-            </Pressable>
-          ) : null}
+              {current.message}
+            </Text>
+            {current.action ? (
+              <Pressable
+                hitSlop={12}
+                accessibilityRole="button"
+                onPress={() => {
+                  current.action?.onPress();
+                  dismiss(current.id);
+                }}
+                style={styles.action}
+              >
+                <Text variant="calloutMedium" style={styles.actionLabel}>
+                  {current.action.label}
+                </Text>
+              </Pressable>
+            ) : null}
+          </Animated.View>
         </Animated.View>
       </GestureDetector>
     </View>
@@ -96,12 +119,14 @@ const styles = StyleSheet.create(theme => ({
     alignItems: 'center',
     paddingHorizontal: theme.size.gutter,
   },
+  slot: {
+    width: '100%',
+    maxWidth: 480,
+  },
   toast: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: theme.space[3],
-    width: '100%',
-    maxWidth: 480,
     minHeight: 48,
     paddingLeft: theme.space[4],
     paddingRight: theme.space[2],

@@ -27,13 +27,23 @@ export type SwitchProps = {
   testID?: string;
 };
 
-export function Switch({ value, onValueChange, accessibilityLabel, disabled, testID }: SwitchProps) {
+export function Switch({
+  value,
+  onValueChange,
+  accessibilityLabel,
+  disabled,
+  testID,
+}: SwitchProps) {
   const { theme } = useUnistyles();
   const reduceMotion = useReducedMotion();
   const progress = useSharedValue(value ? 1 : 0);
 
   useEffect(() => {
-    progress.value = reduceMotion ? (value ? 1 : 0) : withSpring(value ? 1 : 0, spring.snappy);
+    progress.value = reduceMotion
+      ? value
+        ? 1
+        : 0
+      : withSpring(value ? 1 : 0, spring.snappy);
   }, [progress, reduceMotion, value]);
 
   const off = theme.colors.border.default;

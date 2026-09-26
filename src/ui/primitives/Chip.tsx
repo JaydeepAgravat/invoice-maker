@@ -27,11 +27,20 @@ export function Chip({
       hitSlop={{ top: 6, bottom: 6 }}
       style={styles.chip}
     >
-      <Text variant="label" tone={selected ? 'primary' : 'secondary'} maxFontSizeMultiplier={1.5}>
+      <Text
+        variant="label"
+        tone={selected ? 'primary' : 'secondary'}
+        maxFontSizeMultiplier={1.5}
+      >
         {label}
       </Text>
       {count !== undefined ? (
-        <Text variant="caption" tone="tertiary" tabular maxFontSizeMultiplier={1.5}>
+        <Text
+          variant="caption"
+          tone="tertiary"
+          tabular
+          maxFontSizeMultiplier={1.5}
+        >
           {count}
         </Text>
       ) : null}

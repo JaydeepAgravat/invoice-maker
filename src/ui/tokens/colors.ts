@@ -66,16 +66,56 @@ const accentDark = {
 
 const status = {
   light: {
-    green: { bg: '#E6F6EB', border: '#B2DDB5', solid: '#30A46C', text: '#218358' },
-    amber: { bg: '#FFF7C2', border: '#F3D673', solid: '#FFC53D', text: '#AB6400' },
-    red: { bg: '#FEEBEC', border: '#FDBDBE', solid: '#E5484D', text: '#CE2C31' },
-    blue: { bg: '#E6F4FE', border: '#ACD8FC', solid: '#0090FF', text: '#0D74CE' },
+    green: {
+      bg: '#E6F6EB',
+      border: '#B2DDB5',
+      solid: '#30A46C',
+      text: '#218358',
+    },
+    amber: {
+      bg: '#FFF7C2',
+      border: '#F3D673',
+      solid: '#FFC53D',
+      text: '#AB6400',
+    },
+    red: {
+      bg: '#FEEBEC',
+      border: '#FDBDBE',
+      solid: '#E5484D',
+      text: '#CE2C31',
+    },
+    blue: {
+      bg: '#E6F4FE',
+      border: '#ACD8FC',
+      solid: '#0090FF',
+      text: '#0D74CE',
+    },
   },
   dark: {
-    green: { bg: '#132D21', border: '#20573E', solid: '#30A46C', text: '#3DD68C' },
-    amber: { bg: '#302008', border: '#5C3D05', solid: '#FFC53D', text: '#FFCA16' },
-    red: { bg: '#3B1219', border: '#72232D', solid: '#E5484D', text: '#FF9592' },
-    blue: { bg: '#0D2847', border: '#104D87', solid: '#0090FF', text: '#70B8FF' },
+    green: {
+      bg: '#132D21',
+      border: '#20573E',
+      solid: '#30A46C',
+      text: '#3DD68C',
+    },
+    amber: {
+      bg: '#302008',
+      border: '#5C3D05',
+      solid: '#FFC53D',
+      text: '#FFCA16',
+    },
+    red: {
+      bg: '#3B1219',
+      border: '#72232D',
+      solid: '#E5484D',
+      text: '#FF9592',
+    },
+    blue: {
+      bg: '#0D2847',
+      border: '#104D87',
+      solid: '#0090FF',
+      text: '#70B8FF',
+    },
   },
 } as const;
 
@@ -158,7 +198,12 @@ export const lightColors: ColorTokens = {
     text: accentLight[11],
   },
   status: {
-    neutral: { bg: slateLight[3], border: slateLight[6], solid: slateLight[9], text: slateLight[11] },
+    neutral: {
+      bg: slateLight[3],
+      border: slateLight[6],
+      solid: slateLight[9],
+      text: slateLight[11],
+    },
     info: status.light.blue,
     success: status.light.green,
     warning: status.light.amber,
@@ -204,12 +249,20 @@ export const darkColors: ColorTokens = {
     text: accentDark[11],
   },
   status: {
-    neutral: { bg: slateDark[3], border: slateDark[6], solid: slateDark[9], text: slateDark[11] },
+    neutral: {
+      bg: slateDark[3],
+      border: slateDark[6],
+      solid: slateDark[9],
+      text: slateDark[11],
+    },
     info: status.dark.blue,
     success: status.dark.green,
     warning: status.dark.amber,
     danger: status.dark.red,
   },
-  overlay: { scrim: 'rgba(0, 0, 0, 0.56)', hairline: 'rgba(255, 255, 255, 0.06)' },
+  overlay: {
+    scrim: 'rgba(0, 0, 0, 0.56)',
+    hairline: 'rgba(255, 255, 255, 0.06)',
+  },
   shadow: '#000000',
 };

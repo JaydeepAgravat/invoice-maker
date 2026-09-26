@@ -48,11 +48,18 @@ export function ListRow({
       {leading ??
         (leadingIcon && (
           <View style={styles.leadingIcon}>
-            <Icon icon={leadingIcon} tone={destructive ? 'danger' : 'secondary'} />
+            <Icon
+              icon={leadingIcon}
+              tone={destructive ? 'danger' : 'secondary'}
+            />
           </View>
         ))}
       <View style={styles.main}>
-        <Text variant="bodyMedium" tone={destructive ? 'danger' : 'primary'} numberOfLines={1}>
+        <Text
+          variant="bodyMedium"
+          tone={destructive ? 'danger' : 'primary'}
+          numberOfLines={1}
+        >
           {title}
         </Text>
         {subtitle ? (
@@ -77,7 +84,7 @@ export function ListRow({
           )}
         </View>
       )}
-      {trailing}
+      {trailing ? <View style={styles.trailing}>{trailing}</View> : null}
       {showChevron && <Icon icon={ChevronRight} size={16} tone="tertiary" />}
     </>
   );
@@ -125,6 +132,10 @@ const styles = StyleSheet.create(theme => ({
   main: {
     flex: 1,
     gap: 2,
+  },
+  trailing: {
+    alignSelf: 'center',
+    alignItems: 'flex-end',
   },
   side: {
     alignItems: 'flex-end',

@@ -25,7 +25,11 @@ export function PlaceholderScreen({
         title={title}
         left={
           width >= breakpoints.lg ? undefined : (
-            <IconButton icon={Menu} label={t('common.openMenu')} onPress={navigation.openDrawer} />
+            <IconButton
+              icon={Menu}
+              label={t('common.openMenu')}
+              onPress={navigation.openDrawer}
+            />
           )
         }
       />

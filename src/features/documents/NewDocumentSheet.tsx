@@ -67,7 +67,9 @@ export function NewDocumentSheet({ ref, onSelect }: Props) {
           key={d.type}
           title={t(d.labelKey)}
           leadingIcon={d.icon}
-          trailing={d.pro ? <Badge label="Pro" tone="accent" dot={false} /> : undefined}
+          trailing={
+            d.pro ? <Badge label="Pro" tone="accent" dot={false} /> : undefined
+          }
           onPress={() => pick(d.type)}
           accessibilityLabel={d.pro ? `${t(d.labelKey)}, Pro` : t(d.labelKey)}
         />

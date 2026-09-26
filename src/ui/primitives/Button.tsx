@@ -68,16 +68,26 @@ export function Button({
     >
       <View style={[styles.content, loading && styles.hidden]}>
         {leadingIcon && <Icon icon={leadingIcon} size={iconSize} tone={tone} />}
-        <Text variant={size === 'lg' ? 'bodyMedium' : 'calloutMedium'} tone={tone} numberOfLines={1}>
+        <Text
+          variant={size === 'lg' ? 'bodyMedium' : 'calloutMedium'}
+          tone={tone}
+          numberOfLines={1}
+        >
           {label}
         </Text>
-        {trailingIcon && <Icon icon={trailingIcon} size={iconSize} tone={tone} />}
+        {trailingIcon && (
+          <Icon icon={trailingIcon} size={iconSize} tone={tone} />
+        )}
       </View>
       {loading && (
         <View style={styles.spinner}>
           <ActivityIndicator
             size="small"
-            color={variant === 'primary' ? theme.colors.text.onAccent : theme.colors.text.secondary}
+            color={
+              variant === 'primary'
+                ? theme.colors.text.onAccent
+                : theme.colors.text.secondary
+            }
           />
         </View>
       )}
@@ -111,9 +121,19 @@ const styles = StyleSheet.create(theme => ({
         },
       },
       size: {
-        sm: { minHeight: theme.size.controlSmall, paddingHorizontal: theme.space[3] },
-        md: { minHeight: theme.size.control, paddingHorizontal: theme.space[4] },
-        lg: { minHeight: theme.size.hit, paddingHorizontal: theme.space[5], borderRadius: theme.radius.lg },
+        sm: {
+          minHeight: theme.size.controlSmall,
+          paddingHorizontal: theme.space[3],
+        },
+        md: {
+          minHeight: theme.size.control,
+          paddingHorizontal: theme.space[4],
+        },
+        lg: {
+          minHeight: theme.size.hit,
+          paddingHorizontal: theme.space[5],
+          borderRadius: theme.radius.lg,
+        },
       },
     },
   },

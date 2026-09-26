@@ -16,6 +16,15 @@ npm start
 npm run android
 ```
 
+On Android 17 (API 37) devices, debug builds need local-network access to reach Metro.
+Grant it once after installing instead of tapping through the prompt:
+
+```bash
+adb shell pm grant com.invoiceapp.dev android.permission.ACCESS_LOCAL_NETWORK
+```
+
+Release builds never include this permission.
+
 ## Checks
 
 ```bash

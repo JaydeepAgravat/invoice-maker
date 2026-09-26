@@ -27,12 +27,18 @@ export function Skeleton({
 
   useEffect(() => {
     if (!reduceMotion) {
-      pulse.value = withRepeat(withTiming(1, { duration: 900, easing: easing.standard }), -1, true);
+      pulse.value = withRepeat(
+        withTiming(1, { duration: 900, easing: easing.standard }),
+        -1,
+        true,
+      );
     }
     return () => cancelAnimation(pulse);
   }, [pulse, reduceMotion]);
 
-  const animated = useAnimatedStyle(() => ({ opacity: 1 - pulse.value * 0.45 }));
+  const animated = useAnimatedStyle(() => ({
+    opacity: 1 - pulse.value * 0.45,
+  }));
 
   return (
     <Animated.View

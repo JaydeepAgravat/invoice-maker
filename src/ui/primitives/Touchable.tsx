@@ -54,12 +54,16 @@ export function Touchable({
   const reduceMotion = useReducedMotion();
   const pressed = useSharedValue(0);
 
-  const useScale = !reduceMotion && (feedback === 'scale' || feedback === 'both');
+  const useScale =
+    !reduceMotion && (feedback === 'scale' || feedback === 'both');
   const useTint = feedback === 'highlight' || feedback === 'both';
 
   const handlePressIn = useCallback(
     (e: GestureResponderEvent) => {
-      pressed.value = withTiming(1, { duration: duration.fast / 2, easing: easing.decelerate });
+      pressed.value = withTiming(1, {
+        duration: duration.fast / 2,
+        easing: easing.decelerate,
+      });
       onPressIn?.(e);
     },
     [onPressIn, pressed],
@@ -67,7 +71,10 @@ export function Touchable({
 
   const handlePressOut = useCallback(
     (e: GestureResponderEvent) => {
-      pressed.value = withTiming(0, { duration: duration.base, easing: easing.standard });
+      pressed.value = withTiming(0, {
+        duration: duration.base,
+        easing: easing.standard,
+      });
       onPressOut?.(e);
     },
     [onPressOut, pressed],
@@ -100,7 +107,12 @@ export function Touchable({
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       onPress={handlePress}
-      style={[style, useTint && styles.clip, scaleStyle, disabled && styles.disabled]}
+      style={[
+        style,
+        useTint && styles.clip,
+        scaleStyle,
+        disabled && styles.disabled,
+      ]}
     >
       {children}
       {useTint && (
@@ -113,7 +125,9 @@ export function Touchable({
 const styles = StyleSheet.create(theme => ({
   tint: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: theme.dark ? 'rgba(255,255,255,0.05)' : 'rgba(16,16,20,0.045)',
+    backgroundColor: theme.dark
+      ? 'rgba(255,255,255,0.05)'
+      : 'rgba(16,16,20,0.045)',
   },
   clip: {
     overflow: 'hidden',

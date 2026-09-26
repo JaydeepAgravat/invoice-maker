@@ -27,20 +27,81 @@ export function EmptyDocuments({ size = 136 }: { size?: number }) {
         transform="rotate(6 70 54)"
       />
       {/* Front sheet */}
-      <Rect x={26} y={14} width={72} height={92} rx={8} fill={c.bg.surface} stroke={stroke} strokeWidth={1.5} />
+      <Rect
+        x={26}
+        y={14}
+        width={72}
+        height={92}
+        rx={8}
+        fill={c.bg.surface}
+        stroke={stroke}
+        strokeWidth={1.5}
+      />
       {/* Header: logo dot + title lines */}
-      <Circle cx={39} cy={28} r={5} fill={c.accent.subtle} stroke={c.accent.border} strokeWidth={1.5} />
-      <Path d="M50 26h20M50 31h12" stroke={line} strokeWidth={1.5} strokeLinecap="round" />
-      <Path d="M78 26h10" stroke={line} strokeWidth={1.5} strokeLinecap="round" />
+      <Circle
+        cx={39}
+        cy={28}
+        r={5}
+        fill={c.accent.subtle}
+        stroke={c.accent.border}
+        strokeWidth={1.5}
+      />
+      <Path
+        d="M50 26h20M50 31h12"
+        stroke={line}
+        strokeWidth={1.5}
+        strokeLinecap="round"
+      />
+      <Path
+        d="M78 26h10"
+        stroke={line}
+        strokeWidth={1.5}
+        strokeLinecap="round"
+      />
       {/* Line items */}
-      <Path d="M36 46h52" stroke={line} strokeWidth={1} strokeLinecap="round" strokeDasharray="0.01 0" />
-      <Path d="M36 54h26M78 54h10M36 63h32M78 63h10M36 72h20M78 72h10" stroke={line} strokeWidth={1.5} strokeLinecap="round" />
+      <Path
+        d="M36 46h52"
+        stroke={line}
+        strokeWidth={1}
+        strokeLinecap="round"
+        strokeDasharray="0.01 0"
+      />
+      <Path
+        d="M36 54h26M78 54h10M36 63h32M78 63h10M36 72h20M78 72h10"
+        stroke={line}
+        strokeWidth={1.5}
+        strokeLinecap="round"
+      />
       {/* Total bar */}
-      <Rect x={60} y={84} width={30} height={10} rx={3} fill={c.accent.subtle} />
-      <Path d="M65 89h20" stroke={c.accent.solid} strokeWidth={1.5} strokeLinecap="round" />
+      <Rect
+        x={60}
+        y={84}
+        width={30}
+        height={10}
+        rx={3}
+        fill={c.accent.subtle}
+      />
+      <Path
+        d="M65 89h20"
+        stroke={c.accent.solid}
+        strokeWidth={1.5}
+        strokeLinecap="round"
+      />
       {/* Plus badge */}
-      <Circle cx={100} cy={96} r={11} fill={c.bg.surface} stroke={stroke} strokeWidth={1.5} />
-      <Path d="M100 91v10M95 96h10" stroke={c.text.secondary} strokeWidth={1.5} strokeLinecap="round" />
+      <Circle
+        cx={100}
+        cy={96}
+        r={11}
+        fill={c.bg.surface}
+        stroke={stroke}
+        strokeWidth={1.5}
+      />
+      <Path
+        d="M100 91v10M95 96h10"
+        stroke={c.text.secondary}
+        strokeWidth={1.5}
+        strokeLinecap="round"
+      />
     </Svg>
   );
 }

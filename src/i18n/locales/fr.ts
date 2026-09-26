@@ -70,7 +70,8 @@ const fr: Messages = {
     themeLight: 'Clair',
     themeDark: 'Sombre',
     haptics: 'Retour haptique',
-    hapticsHint: 'Légères vibrations lorsque vous touchez, balayez et confirmez',
+    hapticsHint:
+      'Légères vibrations lorsque vous touchez, balayez et confirmez',
     language: 'Langue',
     languageSystem: 'Langue du téléphone',
     developer: 'Développeur',

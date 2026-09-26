@@ -16,11 +16,13 @@ export type Toast = {
 
 type ToastState = {
   current: Toast | null;
-  show: (toast: Omit<Toast, 'id' | 'durationMs' | 'tone'> & {
-    tone?: ToastTone;
-    durationMs?: number;
-    haptic?: HapticKind;
-  }) => void;
+  show: (
+    toast: Omit<Toast, 'id' | 'durationMs' | 'tone'> & {
+      tone?: ToastTone;
+      durationMs?: number;
+      haptic?: HapticKind;
+    },
+  ) => void;
   dismiss: (id?: number) => void;
 };
 
@@ -48,7 +50,9 @@ export const useToastStore = create<ToastState>((set, get) => ({
     }
     set({ current: toast });
     AccessibilityInfo.announceForAccessibility(
-      rest.action ? `${rest.message}. ${rest.action.label} available.` : rest.message,
+      rest.action
+        ? `${rest.message}. ${rest.action.label} available.`
+        : rest.message,
     );
     timer = setTimeout(() => get().dismiss(toast.id), toast.durationMs);
   },
@@ -65,6 +69,7 @@ export const useToastStore = create<ToastState>((set, get) => ({
 }));
 
 export const toast = {
-  show: (...args: Parameters<ToastState['show']>) => useToastStore.getState().show(...args),
+  show: (...args: Parameters<ToastState['show']>) =>
+    useToastStore.getState().show(...args),
   dismiss: () => useToastStore.getState().dismiss(),
 };

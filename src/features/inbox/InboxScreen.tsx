@@ -1,7 +1,10 @@
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, View, useWindowDimensions } from 'react-native';
-import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
+import Animated, {
+  useAnimatedScrollHandler,
+  useSharedValue,
+} from 'react-native-reanimated';
 import { StyleSheet } from 'react-native-unistyles';
 
 import { Menu, Search } from 'lucide-react-native';
@@ -16,7 +19,14 @@ import { toast } from '@/ui/toast/store';
 
 import { NewButton } from './NewButton';
 
-const VIEWS: readonly InboxView[] = ['all', 'drafts', 'unpaid', 'overdue', 'estimates', 'paid'];
+const VIEWS: readonly InboxView[] = [
+  'all',
+  'drafts',
+  'unpaid',
+  'overdue',
+  'estimates',
+  'paid',
+];
 
 export function InboxScreen({ navigation, route }: DrawerProps<'Inbox'>) {
   const { t } = useTranslation();
@@ -33,11 +43,15 @@ export function InboxScreen({ navigation, route }: DrawerProps<'Inbox'>) {
   return (
     <View style={styles.screen}>
       <ScreenHeader
-        title={t(`views.${view}`)}
+        title={t('nav.inbox')}
         scrollY={scrollY}
         left={
           permanentDrawer ? undefined : (
-            <IconButton icon={Menu} label={t('common.openMenu')} onPress={navigation.openDrawer} />
+            <IconButton
+              icon={Menu}
+              label={t('common.openMenu')}
+              onPress={navigation.openDrawer}
+            />
           )
         }
         right={
@@ -75,7 +89,10 @@ export function InboxScreen({ navigation, route }: DrawerProps<'Inbox'>) {
           illustration={<EmptyDocuments />}
           title={t('inbox.emptyTitle')}
           body={t('inbox.emptyBody')}
-          action={{ label: t('inbox.emptyAction'), onPress: () => sheet.current?.present() }}
+          action={{
+            label: t('inbox.emptyAction'),
+            onPress: () => sheet.current?.present(),
+          }}
         />
       </Animated.ScrollView>
 

@@ -18,6 +18,8 @@ describe('initials', () => {
 describe('hashString', () => {
   it('is stable and non-negative', () => {
     expect(hashString('Acme')).toBe(hashString('Acme'));
-    expect(hashString('a very long client name that overflows')).toBeGreaterThanOrEqual(0);
+    expect(
+      hashString('a very long client name that overflows'),
+    ).toBeGreaterThanOrEqual(0);
   });
 });

@@ -4,8 +4,15 @@ import {
   BottomSheetView,
   type BottomSheetBackdropProps,
 } from '@gorhom/bottom-sheet';
-import { useCallback, type Ref } from 'react';
-import { View } from 'react-native';
+import {
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+  type Ref,
+} from 'react';
+import { BackHandler, View } from 'react-native';
 import { ReduceMotion } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
@@ -27,9 +34,32 @@ export type SheetProps = {
  * Bottom sheet with the app's surface, handle and scrim. Content-sized by
  * default; keyboard-aware; dismissed by swipe, back gesture or scrim tap.
  */
-export function Sheet({ title, children, onDismiss, snapPoints, ref }: SheetProps) {
+export function Sheet({
+  title,
+  children,
+  onDismiss,
+  snapPoints,
+  ref,
+}: SheetProps) {
   const { theme } = useUnistyles();
   const insets = useSafeAreaInsets();
+  const modal = useRef<BottomSheetModal>(null);
+  const [open, setOpen] = useState(false);
+
+  useImperativeHandle(ref, () => modal.current as BottomSheetModal, []);
+
+  // Android back (including the predictive back gesture) closes the sheet
+  // first instead of leaving the screen.
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      modal.current?.dismiss();
+      return true;
+    });
+    return () => sub.remove();
+  }, [open]);
 
   const renderBackdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
@@ -47,8 +77,12 @@ export function Sheet({ title, children, onDismiss, snapPoints, ref }: SheetProp
 
   return (
     <BottomSheetModal
-      ref={ref}
-      onDismiss={onDismiss}
+      ref={modal}
+      onChange={index => setOpen(index >= 0)}
+      onDismiss={() => {
+        setOpen(false);
+        onDismiss?.();
+      }}
       snapPoints={snapPoints}
       enableDynamicSizing={!snapPoints}
       backdropComponent={renderBackdrop}
@@ -60,7 +94,12 @@ export function Sheet({ title, children, onDismiss, snapPoints, ref }: SheetProp
       overrideReduceMotion={ReduceMotion.System}
       accessibilityLabel={title}
     >
-      <BottomSheetView style={[styles.content, { paddingBottom: insets.bottom + theme.space[4] }]}>
+      <BottomSheetView
+        style={[
+          styles.content,
+          { paddingBottom: insets.bottom + theme.space[4] },
+        ]}
+      >
         {title ? (
           <View style={styles.header}>
             <Text variant="headline" accessibilityRole="header">

@@ -25,7 +25,11 @@ import { toast } from '@/ui/toast/store';
 
 import type { DrawerParamList, InboxView } from './navigation';
 
-const VIEWS: ReadonlyArray<{ view: InboxView; icon: LucideIcon; tone?: IconTone }> = [
+const VIEWS: ReadonlyArray<{
+  view: InboxView;
+  icon: LucideIcon;
+  tone?: IconTone;
+}> = [
   { view: 'all', icon: Layers },
   { view: 'drafts', icon: FilePen },
   { view: 'unpaid', icon: CircleDashed },
@@ -71,8 +75,17 @@ function NavItem({
       accessibilityLabel={count ? `${label}, ${count}` : label}
       style={[styles.item, active && styles.itemActive]}
     >
-      <Icon icon={icon} size={18} tone={active ? 'primary' : tone ?? 'secondary'} />
-      <Text variant="calloutMedium" tone={active ? 'primary' : 'secondary'} style={styles.itemLabel} numberOfLines={1}>
+      <Icon
+        icon={icon}
+        size={18}
+        tone={active ? 'primary' : tone ?? 'secondary'}
+      />
+      <Text
+        variant="calloutMedium"
+        tone={active ? 'primary' : 'secondary'}
+        style={styles.itemLabel}
+        numberOfLines={1}
+      >
         {label}
       </Text>
       {count ? (
@@ -90,7 +103,7 @@ export function AppDrawer({ state, navigation }: DrawerContentComponentProps) {
   const current = state.routes[state.index];
   const currentView =
     current?.name === 'Inbox'
-      ? ((current.params as DrawerParamList['Inbox'])?.view ?? 'all')
+      ? (current.params as DrawerParamList['Inbox'])?.view ?? 'all'
       : null;
 
   return (
@@ -115,7 +128,11 @@ export function AppDrawer({ state, navigation }: DrawerContentComponentProps) {
         </Text>
       </Touchable>
 
-      <ScrollView style={styles.flex} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.flex}
+        contentContainerStyle={styles.scroll}
+        showsVerticalScrollIndicator={false}
+      >
         <Text variant="overline" tone="tertiary" style={styles.group}>
           {t('nav.views')}
         </Text>
@@ -149,7 +166,11 @@ export function AppDrawer({ state, navigation }: DrawerContentComponentProps) {
         {MONEY.map(d => (
           <NavItem
             key={d.route}
-            label={t(`nav.${d.route.toLowerCase() as 'expenses' | 'mileage' | 'reports'}`)}
+            label={t(
+              `nav.${
+                d.route.toLowerCase() as 'expenses' | 'mileage' | 'reports'
+              }`,
+            )}
             icon={d.icon}
             active={current?.name === d.route}
             onPress={() => navigation.navigate(d.route)}

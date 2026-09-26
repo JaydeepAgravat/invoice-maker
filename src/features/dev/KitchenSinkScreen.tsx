@@ -1,4 +1,11 @@
-import { ArrowLeft, Download, Plus, Send, Share2, Trash2 } from 'lucide-react-native';
+import {
+  ArrowLeft,
+  Download,
+  Plus,
+  Send,
+  Share2,
+  Trash2,
+} from 'lucide-react-native';
 import { useRef, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -43,7 +50,9 @@ const TYPE_SAMPLES: ReadonlyArray<[TypographyVariant, string]> = [
 ];
 
 /** Dev-only gallery of every primitive, used to review light and dark themes. */
-export function KitchenSinkScreen({ navigation }: RootScreenProps<'KitchenSink'>) {
+export function KitchenSinkScreen({
+  navigation,
+}: RootScreenProps<'KitchenSink'>) {
   const { theme } = useUnistyles();
   const insets = useSafeAreaInsets();
   const sheet = useRef<SheetRef>(null);
@@ -55,7 +64,13 @@ export function KitchenSinkScreen({ navigation }: RootScreenProps<'KitchenSink'>
     <View style={styles.screen}>
       <ScreenHeader
         title="Component gallery"
-        left={<IconButton icon={ArrowLeft} label="Back" onPress={navigation.goBack} />}
+        left={
+          <IconButton
+            icon={ArrowLeft}
+            label="Back"
+            onPress={navigation.goBack}
+          />
+        }
       />
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 48 }}>
         <SectionHeader title="Typography" />
@@ -65,7 +80,12 @@ export function KitchenSinkScreen({ navigation }: RootScreenProps<'KitchenSink'>
               <Text variant="caption" tone="tertiary" style={styles.typeName}>
                 {variant}
               </Text>
-              <Text variant={variant} tabular={variant === 'display'} style={styles.flex} numberOfLines={1}>
+              <Text
+                variant={variant}
+                tabular={variant === 'display'}
+                style={styles.flex}
+                numberOfLines={1}
+              >
                 {sample}
               </Text>
             </View>
@@ -105,14 +125,30 @@ export function KitchenSinkScreen({ navigation }: RootScreenProps<'KitchenSink'>
           <Button variant="primary" label="Send invoice" leadingIcon={Send} />
           <Button variant="secondary" label="Preview" />
           <Button variant="ghost" label="Share" leadingIcon={Share2} />
-          <Button variant="danger" label="Delete" leadingIcon={Trash2} haptic="warning" />
+          <Button
+            variant="danger"
+            label="Delete"
+            leadingIcon={Trash2}
+            haptic="warning"
+          />
           <Button variant="primary" size="sm" label="Small" />
-          <Button variant="secondary" size="sm" label="Download" leadingIcon={Download} />
+          <Button
+            variant="secondary"
+            size="sm"
+            label="Download"
+            leadingIcon={Download}
+          />
           <Button variant="primary" label="Saving" loading />
           <Button variant="secondary" label="Disabled" disabled />
         </View>
         <View style={styles.pad}>
-          <Button variant="primary" size="lg" label="Record payment" fullWidth haptic="success" />
+          <Button
+            variant="primary"
+            size="lg"
+            label="Record payment"
+            fullWidth
+            haptic="success"
+          />
         </View>
         <View style={[styles.pad, styles.wrap]}>
           <IconButton icon={Plus} label="Add" />
@@ -132,9 +168,18 @@ export function KitchenSinkScreen({ navigation }: RootScreenProps<'KitchenSink'>
         </View>
 
         <SectionHeader title="Selection" />
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.padH, styles.row]}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={[styles.padH, styles.row]}
+        >
           {['all', 'drafts', 'unpaid', 'overdue', 'paid'].map(c => (
-            <Chip key={c} label={c[0]!.toUpperCase() + c.slice(1)} selected={chip === c} onPress={() => setChip(c)} />
+            <Chip
+              key={c}
+              label={c[0]!.toUpperCase() + c.slice(1)}
+              selected={chip === c}
+              onPress={() => setChip(c)}
+            />
           ))}
         </ScrollView>
         <View style={[styles.pad, styles.stack]}>
@@ -149,7 +194,11 @@ export function KitchenSinkScreen({ navigation }: RootScreenProps<'KitchenSink'>
           />
           <View style={styles.rowBetween}>
             <Text>Prices include tax</Text>
-            <Switch value={on} onValueChange={setOn} accessibilityLabel="Prices include tax" />
+            <Switch
+              value={on}
+              onValueChange={setOn}
+              accessibilityLabel="Prices include tax"
+            />
           </View>
         </View>
 
@@ -164,7 +213,11 @@ export function KitchenSinkScreen({ navigation }: RootScreenProps<'KitchenSink'>
             prefix={<Text tone="tertiary">$</Text>}
             hint="Excluding tax"
           />
-          <TextField label="Email" defaultValue="accounts@acme" error="Enter a valid email address" />
+          <TextField
+            label="Email"
+            defaultValue="accounts@acme"
+            error="Enter a valid email address"
+          />
         </View>
 
         <SectionHeader title="Document rows" />
@@ -206,20 +259,32 @@ export function KitchenSinkScreen({ navigation }: RootScreenProps<'KitchenSink'>
 
         <SectionHeader title="Feedback" />
         <View style={[styles.pad, styles.wrap]}>
-          <Button label="Toast" onPress={() => toast.show({ message: 'Draft saved' })} />
+          <Button
+            label="Toast"
+            onPress={() => toast.show({ message: 'Draft saved' })}
+          />
           <Button
             label="Undo toast"
             onPress={() =>
               toast.show({
                 message: 'Invoice deleted',
-                action: { label: 'Undo', onPress: () => toast.show({ message: 'Restored' }) },
+                action: {
+                  label: 'Undo',
+                  onPress: () => toast.show({ message: 'Restored' }),
+                },
                 haptic: 'warning',
               })
             }
           />
           <Button
             label="Success"
-            onPress={() => toast.show({ message: 'Payment recorded', tone: 'success', haptic: 'success' })}
+            onPress={() =>
+              toast.show({
+                message: 'Payment recorded',
+                tone: 'success',
+                haptic: 'success',
+              })
+            }
           />
           <Button label="Sheet" onPress={() => sheet.current?.present()} />
         </View>
@@ -237,8 +302,19 @@ export function KitchenSinkScreen({ navigation }: RootScreenProps<'KitchenSink'>
 
       <Sheet ref={sheet} title="Record payment">
         <View style={[styles.pad, styles.stack]}>
-          <TextField label="Amount" keyboardType="decimal-pad" tabular prefix={<Text tone="tertiary">$</Text>} />
-          <Button variant="primary" size="lg" label="Save payment" fullWidth onPress={() => sheet.current?.dismiss()} />
+          <TextField
+            label="Amount"
+            keyboardType="decimal-pad"
+            tabular
+            prefix={<Text tone="tertiary">$</Text>}
+          />
+          <Button
+            variant="primary"
+            size="lg"
+            label="Save payment"
+            fullWidth
+            onPress={() => sheet.current?.dismiss()}
+          />
         </View>
       </Sheet>
     </View>
@@ -278,6 +354,7 @@ const styles = StyleSheet.create(theme => ({
   wrap: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    alignItems: 'center',
     gap: theme.space[2],
   },
   typeRow: {

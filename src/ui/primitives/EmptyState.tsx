@@ -26,7 +26,12 @@ export function EmptyState({
         {title}
       </Text>
       {body ? (
-        <Text variant="callout" tone="secondary" align="center" style={styles.body}>
+        <Text
+          variant="callout"
+          tone="secondary"
+          align="center"
+          style={styles.body}
+        >
           {body}
         </Text>
       ) : null}

@@ -3,7 +3,13 @@ import { StyleSheet } from 'react-native-unistyles';
 
 import { Text } from './Text';
 
-export function SectionHeader({ title, action }: { title: string; action?: React.ReactNode }) {
+export function SectionHeader({
+  title,
+  action,
+}: {
+  title: string;
+  action?: React.ReactNode;
+}) {
   return (
     <View style={styles.row} accessibilityRole="header">
       <Text variant="overline" tone="tertiary">

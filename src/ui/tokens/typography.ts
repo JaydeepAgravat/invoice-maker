@@ -31,7 +31,12 @@ const style = (
   fontSize: number,
   lineHeight: number,
   letterSpacing: number,
-): TextStyleToken => ({ fontFamily: family, fontSize, lineHeight, letterSpacing });
+): TextStyleToken => ({
+  fontFamily: family,
+  fontSize,
+  lineHeight,
+  letterSpacing,
+});
 
 export const typography = {
   /** Hero numbers: outstanding totals, amount due. */

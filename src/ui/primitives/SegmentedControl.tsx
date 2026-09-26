@@ -32,13 +32,19 @@ export function SegmentedControl<T extends string>({
 }: SegmentedControlProps<T>) {
   const reduceMotion = useReducedMotion();
   const [width, setWidth] = useState(0);
-  const index = Math.max(0, segments.findIndex(s => s.value === value));
+  const index = Math.max(
+    0,
+    segments.findIndex(s => s.value === value),
+  );
   const segmentWidth = width > 0 ? (width - INSET * 2) / segments.length : 0;
   const x = useSharedValue(0);
 
   useEffect(() => {
     const target = index * segmentWidth;
-    x.value = reduceMotion || segmentWidth === 0 ? target : withSpring(target, spring.snappy);
+    x.value =
+      reduceMotion || segmentWidth === 0
+        ? target
+        : withSpring(target, spring.snappy);
   }, [index, reduceMotion, segmentWidth, x]);
 
   const indicatorStyle = useAnimatedStyle(() => ({
@@ -53,7 +59,9 @@ export function SegmentedControl<T extends string>({
       accessibilityRole="tablist"
       accessibilityLabel={accessibilityLabel}
     >
-      {segmentWidth > 0 && <Animated.View style={[styles.indicator, indicatorStyle]} />}
+      {segmentWidth > 0 && (
+        <Animated.View style={[styles.indicator, indicatorStyle]} />
+      )}
       {segments.map(segment => {
         const selected = segment.value === value;
         return (
@@ -99,7 +107,9 @@ const styles = StyleSheet.create(theme => ({
     bottom: INSET,
     left: INSET,
     borderRadius: theme.radius.md - INSET,
-    backgroundColor: theme.dark ? theme.colors.bg.pressed : theme.colors.bg.surface,
+    backgroundColor: theme.dark
+      ? theme.colors.border.default
+      : theme.colors.bg.surface,
     borderWidth: theme.dark ? 0 : theme.stroke.hairline,
     borderColor: theme.colors.border.default,
     ...theme.elevation.raised,

@@ -41,10 +41,16 @@ export function TextField({
   const focus = useSharedValue(0);
 
   const rest_ = theme.colors.border.default;
-  const active = error ? theme.colors.status.danger.solid : theme.colors.border.focus;
+  const active = error
+    ? theme.colors.status.danger.solid
+    : theme.colors.border.focus;
 
   const frameStyle = useAnimatedStyle(() => ({
-    borderColor: interpolateColor(focus.value, [0, 1], [error ? active : rest_, active]),
+    borderColor: interpolateColor(
+      focus.value,
+      [0, 1],
+      [error ? active : rest_, active],
+    ),
   }));
 
   return (
@@ -75,12 +81,18 @@ export function TextField({
           maxFontSizeMultiplier={2}
           onFocus={e => {
             setFocused(true);
-            focus.value = withTiming(1, { duration: duration.fast, easing: easing.standard });
+            focus.value = withTiming(1, {
+              duration: duration.fast,
+              easing: easing.standard,
+            });
             onFocus?.(e);
           }}
           onBlur={e => {
             setFocused(false);
-            focus.value = withTiming(0, { duration: duration.base, easing: easing.standard });
+            focus.value = withTiming(0, {
+              duration: duration.base,
+              easing: easing.standard,
+            });
             onBlur?.(e);
           }}
           style={[styles.input, tabular && styles.tabular]}

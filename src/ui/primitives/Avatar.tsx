@@ -21,7 +21,15 @@ export function Avatar({ name, size = 32 }: { name: string; size?: number }) {
   const [bg, fg] = theme.dark ? hue.dark : hue.light;
   return (
     <View
-      style={[styles.circle, { width: size, height: size, borderRadius: size / 2, backgroundColor: bg }]}
+      style={[
+        styles.circle,
+        {
+          width: size,
+          height: size,
+          borderRadius: size / 2,
+          backgroundColor: bg,
+        },
+      ]}
       accessible={false}
     >
       <Text

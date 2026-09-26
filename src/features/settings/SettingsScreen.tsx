@@ -59,7 +59,11 @@ export function SettingsScreen({ navigation }: DrawerProps<'Settings'>) {
         title={t('nav.settings')}
         left={
           width >= breakpoints.lg ? undefined : (
-            <IconButton icon={Menu} label={t('common.openMenu')} onPress={navigation.openDrawer} />
+            <IconButton
+              icon={Menu}
+              label={t('common.openMenu')}
+              onPress={navigation.openDrawer}
+            />
           )
         }
       />
@@ -109,7 +113,11 @@ export function SettingsScreen({ navigation }: DrawerProps<'Settings'>) {
           <ListRow
             title={t('settings.languageSystem')}
             onPress={() => chooseLanguage(null)}
-            trailing={language === null ? <Icon icon={Check} size={18} tone="accent" /> : undefined}
+            trailing={
+              language === null ? (
+                <Icon icon={Check} size={18} tone="accent" />
+              ) : undefined
+            }
           />
           {SUPPORTED_LANGUAGES.map(code => (
             <View key={code}>
@@ -117,7 +125,11 @@ export function SettingsScreen({ navigation }: DrawerProps<'Settings'>) {
               <ListRow
                 title={LANGUAGE_NAMES[code]}
                 onPress={() => chooseLanguage(code)}
-                trailing={language === code ? <Icon icon={Check} size={18} tone="accent" /> : undefined}
+                trailing={
+                  language === code ? (
+                    <Icon icon={Check} size={18} tone="accent" />
+                  ) : undefined
+                }
               />
             </View>
           ))}
