@@ -11,18 +11,10 @@ import {
   type LucideIcon,
 } from 'lucide-react-native';
 
+import type { DocType } from '@/domain/docTypes';
 import type { Messages } from '@/i18n/locales/en';
 
-export type DocType =
-  | 'INVOICE'
-  | 'ESTIMATE'
-  | 'RECEIPT'
-  | 'CREDIT_NOTE'
-  | 'PROFORMA'
-  | 'DELIVERY_NOTE'
-  | 'CHANGE_ORDER'
-  | 'PURCHASE_ORDER'
-  | 'STATEMENT';
+export type { DocType };
 
 export type DocTypeMeta = {
   type: DocType;
