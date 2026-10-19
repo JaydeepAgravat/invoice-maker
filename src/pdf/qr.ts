@@ -1,4 +1,32 @@
+/* eslint-disable no-bitwise -- UTF-8 encoding is bit-level by nature */
 import qrcode from 'qrcode-generator';
+
+/**
+ * UTF-8 bytes. Our own because the library's ES module build (what Metro
+ * bundles) has no `stringToBytesFuncs` table; only its CommonJS build (what
+ * Jest loads) does.
+ */
+export function utf8Bytes(s: string): number[] {
+  const out: number[] = [];
+  for (const ch of s) {
+    const c = ch.codePointAt(0)!;
+    if (c < 0x80) {
+      out.push(c);
+    } else if (c < 0x800) {
+      out.push(0xc0 | (c >> 6), 0x80 | (c & 0x3f));
+    } else if (c < 0x10000) {
+      out.push(0xe0 | (c >> 12), 0x80 | ((c >> 6) & 0x3f), 0x80 | (c & 0x3f));
+    } else {
+      out.push(
+        0xf0 | (c >> 18),
+        0x80 | ((c >> 12) & 0x3f),
+        0x80 | ((c >> 6) & 0x3f),
+        0x80 | (c & 0x3f),
+      );
+    }
+  }
+  return out;
+}
 
 /**
  * QR code as a compact vector SVG: one path, horizontal runs merged, with
@@ -7,7 +35,7 @@ import qrcode from 'qrcode-generator';
  */
 export function qrSvg(payload: string, opts: { size?: string } = {}): string {
   const previous = qrcode.stringToBytes;
-  qrcode.stringToBytes = qrcode.stringToBytesFuncs['UTF-8']!;
+  qrcode.stringToBytes = utf8Bytes;
   try {
     const qr = qrcode(0, 'M');
     qr.addData(payload, 'Byte');

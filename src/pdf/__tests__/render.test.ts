@@ -1,9 +1,16 @@
+import qrcode from 'qrcode-generator';
+
 import { DOC_TYPES } from '@/domain/docTypes';
 
 import { PDF_LANGUAGES, pdfLabels } from '../labels';
 import { shareMessage } from '../messages';
-import { accentPalette, buildModel, TEMPLATE_IDS, type PdfModel } from '../model';
-import { qrSvg } from '../qr';
+import {
+  accentPalette,
+  buildModel,
+  TEMPLATE_IDS,
+  type PdfModel,
+} from '../model';
+import { qrSvg, utf8Bytes } from '../qr';
 import { esc, renderHtml } from '../render';
 import { renderReportHtml } from '../reportHtml';
 
@@ -28,14 +35,27 @@ describe('full matrix: 9 types × 5 languages × 4 templates × 2 papers', () =>
         const input = await scenario({
           type,
           language: lang,
-          country: lang === 'en' ? 'GB' : lang === 'pt' ? 'BR' : lang === 'es' ? 'ES' : lang === 'fr' ? 'FR' : 'DE',
+          country:
+            lang === 'en'
+              ? 'GB'
+              : lang === 'pt'
+              ? 'BR'
+              : lang === 'es'
+              ? 'ES'
+              : lang === 'fr'
+              ? 'FR'
+              : 'DE',
         });
         const L = pdfLabels(lang, input.business.country);
         for (const template of TEMPLATE_IDS) {
           for (const paperSize of ['A4', 'LETTER'] as const) {
-            const html = renderHtml(buildModel({ ...input, template, paperSize }));
+            const html = renderHtml(
+              buildModel({ ...input, template, paperSize }),
+            );
             assertClean(html);
-            expect(html).toContain(`size: ${paperSize === 'A4' ? 'A4' : 'letter'}`);
+            expect(html).toContain(
+              `size: ${paperSize === 'A4' ? 'A4' : 'letter'}`,
+            );
             expect(html).toContain(`class="t-${template}"`);
             expect(html).toContain(input.doc.number!);
             expect(html).toContain('Harper &amp; Lane Architects');
@@ -70,7 +90,10 @@ describe('model', () => {
   it('prints what is due, with a payment QR and a free-tier footer', async () => {
     const m = buildModel(await scenario({ paid: 'partial' }));
     expect(m.highlight?.label).toBe('Balance due');
-    expect(m.totals.at(-1)).toMatchObject({ label: 'Balance due', tone: 'accent' });
+    expect(m.totals.at(-1)).toMatchObject({
+      label: 'Balance due',
+      tone: 'accent',
+    });
     expect(m.payment?.qr?.svg).toContain('<svg');
     expect(m.pageFooter.center).toBe('Made with Invoice Maker');
     expect(m.stamp).toBeNull();
@@ -94,7 +117,9 @@ describe('model', () => {
   });
 
   it('uses local titles and SEPA / Pix codes', async () => {
-    const es = buildModel(await scenario({ type: 'CREDIT_NOTE', country: 'ES', language: 'es' }));
+    const es = buildModel(
+      await scenario({ type: 'CREDIT_NOTE', country: 'ES', language: 'es' }),
+    );
     expect(es.title).toBe('Factura rectificativa');
     expect(es.subtitle).toBe('Rectifica la factura INV-2026-0001');
     const de = buildModel(await scenario({ country: 'DE', language: 'de' }));
@@ -106,9 +131,15 @@ describe('model', () => {
   });
 
   it('shows prices-included taxes after the total', async () => {
-    const m = buildModel(await scenario({ country: 'DE', language: 'de', pricesIncludeTax: true }));
+    const m = buildModel(
+      await scenario({ country: 'DE', language: 'de', pricesIncludeTax: true }),
+    );
     const i = m.totals.findIndex(r => r.tone === 'strong');
-    expect(m.totals.slice(i + 1).some(r => r.tone === 'muted' && r.label.startsWith('Enthaltene'))).toBe(true);
+    expect(
+      m.totals
+        .slice(i + 1)
+        .some(r => r.tone === 'muted' && r.label.startsWith('Enthaltene')),
+    ).toBe(true);
   });
 
   it('delivery notes have no prices, statements have a ledger', async () => {
@@ -156,6 +187,23 @@ describe('helpers', () => {
     expect(svg).toMatch(/^<svg[^>]+viewBox="0 0 (\d+) \1"/);
     expect(svg).toContain('<path');
   });
+  it('builds a QR without the CommonJS-only encoder table (Metro bundles the ES module)', () => {
+    const lib = qrcode as unknown as { stringToBytesFuncs?: unknown };
+    const funcs = lib.stringToBytesFuncs;
+    delete lib.stringToBytesFuncs;
+    try {
+      expect(qrSvg('https://example.com/ñ')).toContain('<path');
+    } finally {
+      lib.stringToBytesFuncs = funcs;
+    }
+  });
+  it('encodes UTF-8 for 1- to 4-byte characters', () => {
+    expect(utf8Bytes('')).toEqual([]);
+    expect(utf8Bytes('a')).toEqual([0x61]);
+    expect(utf8Bytes('ñ')).toEqual([0xc3, 0xb1]);
+    expect(utf8Bytes('€')).toEqual([0xe2, 0x82, 0xac]);
+    expect(utf8Bytes('𝄞')).toEqual([0xf0, 0x9d, 0x84, 0x9e]);
+  });
 });
 
 describe('share message', () => {
@@ -174,8 +222,17 @@ describe('share message', () => {
       'Hi Amelia,\n\nPlease find invoice INV-0042 for £1,200.00 attached. It is due on 26 Oct 2026.\n\nThank you,\nNorthwind',
     );
     for (const lang of ['es', 'pt', 'fr', 'de', 'xx']) {
-      for (const type of ['INVOICE', 'ESTIMATE', 'RECEIPT', 'DELIVERY_NOTE'] as const) {
-        const m = shareMessage(lang, type, { ...v, client: null, amount: null });
+      for (const type of [
+        'INVOICE',
+        'ESTIMATE',
+        'RECEIPT',
+        'DELIVERY_NOTE',
+      ] as const) {
+        const m = shareMessage(lang, type, {
+          ...v,
+          client: null,
+          amount: null,
+        });
         expect(m.body).toContain('INV-0042');
         expect(m.body).not.toMatch(/undefined|null/);
       }
@@ -198,19 +255,49 @@ describe('report PDF', () => {
         mileage: 450,
         mileageDistance: 10000,
         profit: 3335,
-        byClient: [{ clientId: 'c', name: 'Acme <Ltd>', income: 7785 }, { clientId: null, name: null, income: 1 }],
-        taxCollected: [{ name: 'VAT', rate: 200000, amount: 2595, withholding: false }],
+        byClient: [
+          { clientId: 'c', name: 'Acme <Ltd>', income: 7785 },
+          { clientId: null, name: null, income: 1 },
+        ],
+        taxCollected: [
+          { name: 'VAT', rate: 200000, amount: 2595, withholding: false },
+        ],
         expensesByCategory: [{ category: 'FUEL', amount: 4000 }],
-        aging: { current: 7785, days1to30: 0, days31to60: 0, days61to90: 0, days90plus: 0 },
+        aging: {
+          current: 7785,
+          days1to30: 0,
+          days31to60: 0,
+          days61to90: 0,
+          days90plus: 0,
+        },
         outstanding: 7785,
       },
       labels: {
-        title: 'Business report', period: '2026', generated: 'Generated', profit: 'Profit', income: 'Income',
-        expenses: 'Expenses', mileage: 'Mileage', invoiced: 'Invoiced', credited: 'Credited',
-        outstanding: 'Outstanding', byMonth: 'By month', month: 'Month', byClient: 'Clients', client: 'Client',
-        noClient: 'No client', taxCollected: 'Tax', tax: 'Tax', byCategory: 'Categories', category: 'Category',
-        aging: 'Aging', amount: 'Amount', agingBuckets: ['a', 'b', 'c', 'd', 'e'],
-        categoryName: c => `cat:${c}`, monthName: m => `m:${m}`, taxName: (n, r) => `${n} ${r / 10000}%`,
+        title: 'Business report',
+        period: '2026',
+        generated: 'Generated',
+        profit: 'Profit',
+        income: 'Income',
+        expenses: 'Expenses',
+        mileage: 'Mileage',
+        invoiced: 'Invoiced',
+        credited: 'Credited',
+        outstanding: 'Outstanding',
+        byMonth: 'By month',
+        month: 'Month',
+        byClient: 'Clients',
+        client: 'Client',
+        noClient: 'No client',
+        taxCollected: 'Tax',
+        tax: 'Tax',
+        byCategory: 'Categories',
+        category: 'Category',
+        aging: 'Aging',
+        amount: 'Amount',
+        agingBuckets: ['a', 'b', 'c', 'd', 'e'],
+        categoryName: c => `cat:${c}`,
+        monthName: m => `m:${m}`,
+        taxName: (n, r) => `${n} ${r / 10000}%`,
       },
       business: 'Smith & Co',
       money: m => `£${(m / 100).toFixed(2)}`,

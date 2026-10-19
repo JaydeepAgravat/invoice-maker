@@ -92,6 +92,13 @@ export function SignatureScreen({
     .onUpdate(e => {
       const x = Math.round(e.x * 10) / 10;
       const y = Math.round(e.y * 10) / 10;
+      // Clear can land mid-stroke: a path must never start with a curve.
+      if (!d.value) {
+        d.value = `M${x} ${y}`;
+        last.value = { x, y };
+        grow(x, y);
+        return;
+      }
       const p = last.value;
       const mx = Math.round(((p.x + x) / 2) * 10) / 10;
       const my = Math.round(((p.y + y) / 2) * 10) / 10;
@@ -100,6 +107,9 @@ export function SignatureScreen({
       grow(x, y);
     })
     .onFinalize(() => {
+      if (!d.value) {
+        return;
+      }
       const p = last.value;
       d.value = `${d.value} L${p.x} ${p.y}`;
       scheduleOnRN(setHasInk, true);
