@@ -76,7 +76,7 @@ const WORK: ReadonlyArray<[string, string, number]> = [
 type SeedOptions = { documents?: number; clients?: number; seed?: number };
 
 /** Clock that follows the document being generated, so dates look real. */
-class SeedClock implements Clock {
+export class SeedClock implements Clock {
   constructor(private date: ISODate, private ms: number) {}
   now() {
     return this.ms++;

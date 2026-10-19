@@ -1,5 +1,6 @@
 import { dashboard, listDocuments, viewCounts } from '../repositories/inbox';
 import { seedSampleData } from '../seed';
+import { seedStoryData } from '../seedStory';
 
 import { setupDb } from './helpers';
 
@@ -34,4 +35,18 @@ describe('seedSampleData', () => {
     expect(Date.now() - started).toBeLessThan(250);
     db.close();
   }, 60_000);
+});
+
+describe('seedStoryData', () => {
+  it('builds a small business with paid, unpaid, overdue and draft work', async () => {
+    const { db, clock } = await setupDb('US');
+    await seedStoryData(db, clock);
+
+    const counts = await viewCounts(db, clock.today());
+    expect(counts.all).toBe(12);
+    expect(counts.drafts).toBe(1);
+    expect(counts.overdue).toBe(1);
+    expect(counts.unpaid).toBeGreaterThanOrEqual(2);
+    db.close();
+  });
 });

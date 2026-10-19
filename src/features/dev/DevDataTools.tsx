@@ -10,6 +10,7 @@ import {
   profileExists,
 } from '@/data/repositories/profile';
 import { seedSampleData } from '@/data/seed';
+import { seedStoryData } from '@/data/seedStory';
 import { presetForLocale } from '@/domain/presets';
 import { deviceLocale, resolveLanguage } from '@/i18n';
 import NativeReminders from '@/specs/NativeReminders';
@@ -45,7 +46,7 @@ export function DevDataTools() {
     refresh();
   }, [refresh]);
 
-  const seed = async () => {
+  const seed = (story: boolean) => async () => {
     setBusy(true);
     try {
       const db = await getDatabase();
@@ -59,9 +60,15 @@ export function DevDataTools() {
         await markOnboarded(db);
       }
       const started = Date.now();
-      await seedSampleData(db, clock, { documents: 1000 });
+      if (story) {
+        await seedStoryData(db, clock);
+      } else {
+        await seedSampleData(db, clock, { documents: 1000 });
+      }
       toast.show({
-        message: `Seeded 1,000 documents in ${Date.now() - started} ms`,
+        message: `Seeded ${story ? 'story data' : '1,000 documents'} in ${
+          Date.now() - started
+        } ms`,
         tone: 'success',
         haptic: 'success',
       });
@@ -108,7 +115,15 @@ export function DevDataTools() {
       <ListRow
         title={busy ? 'Seeding…' : 'Load 1,000 sample documents'}
         leadingIcon={DatabaseIcon}
-        onPress={busy ? undefined : seed}
+        onPress={busy ? undefined : seed(false)}
+      />
+      <Divider inset={52} />
+      <ListRow
+        testID="dev-seed-story"
+        title={busy ? 'Seeding…' : 'Load story data'}
+        subtitle="A small plumbing business, for screenshots"
+        leadingIcon={DatabaseIcon}
+        onPress={busy ? undefined : seed(true)}
       />
       <Divider inset={52} />
       <ListRow
